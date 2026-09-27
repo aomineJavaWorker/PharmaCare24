@@ -1,3 +1,29 @@
+<?php
+
+require_once __DIR__ . '/config/database.php';
+
+$stmt = $pdo->query(
+    'SELECT
+        medicines.id,
+        medicines.name,
+        medicines.active_substance,
+        medicines.manufacturer,
+        medicines.dosage_form,
+        medicines.strength,
+        medicines.price,
+        medicines.stock_quantity,
+        medicines.prescription_required,
+        categories.name AS category_name
+    FROM medicines
+    LEFT JOIN categories
+        ON medicines.category_id = categories.id
+    ORDER BY medicines.name ASC'
+);
+
+$medicines = $stmt->fetchAll();
+
+?>
+
 <!DOCTYPE html>
 <html lang="lv">
 
@@ -249,14 +275,116 @@
             </p>
 
 
-            <div class="medicine-placeholder">
+            <div class="medicine-grid">
 
-                <p>
-                    Zāļu katalogs tiks ielādēts
-                    dinamiski no MySQL datubāzes.
+        <?php foreach ($medicines as $medicine): ?>
+
+            <article class="medicine-card">
+
+                <div class="medicine-image">
+                    <span class="medicine-icon">+</span>
+                </div>
+
+                <span class="medicine-category">
+
+                    <?= htmlspecialchars(
+                        $medicine['category_name'] ?? 'Bez kategorijas'
+                    ) ?>
+
+                </span>
+
+
+                <h3>
+                    <?= htmlspecialchars($medicine['name']) ?>
+                </h3>
+
+
+                <p class="medicine-substance">
+
+                    <?= htmlspecialchars(
+                        $medicine['active_substance'] ?? ''
+                    ) ?>
+
                 </p>
 
-            </div>
+
+                <div class="medicine-info">
+
+                    <span>
+                        <?= htmlspecialchars(
+                            $medicine['dosage_form'] ?? ''
+                        ) ?>
+                    </span>
+
+                    <span>
+                        <?= htmlspecialchars(
+                            $medicine['strength'] ?? ''
+                        ) ?>
+                    </span>
+
+                </div>
+
+
+                <div class="medicine-status">
+
+                    <?php if ($medicine['prescription_required']): ?>
+
+                        <span class="prescription prescription-required">
+                            Recepšu zāles
+                        </span>
+
+                    <?php else: ?>
+
+                        <span class="prescription prescription-free">
+                            Bez receptes
+                        </span>
+
+                    <?php endif; ?>
+
+
+                    <?php if ($medicine['stock_quantity'] > 0): ?>
+
+                        <span class="stock available">
+                            Pieejams
+                        </span>
+
+                    <?php else: ?>
+
+                        <span class="stock unavailable">
+                            Nav pieejams
+                        </span>
+
+                    <?php endif; ?>
+
+                </div>
+
+
+                <div class="medicine-bottom">
+
+                    <strong class="medicine-price">
+
+                        <?= number_format(
+                            (float) $medicine['price'],
+                            2,
+                            ',',
+                            ' '
+                        ) ?>
+                        €
+
+                    </strong>
+
+                    <small>
+                        Noliktavā:
+                        <?= (int) $medicine['stock_quantity'] ?>
+                    </small>
+
+                </div>
+
+            </article>
+
+        <?php endforeach; ?>
+
+    </div>
 
         </div>
 

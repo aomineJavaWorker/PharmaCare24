@@ -364,20 +364,192 @@ body {
 
 /* MEDICINES */
 
-.medicine-placeholder {
-    margin-top: 35px;
+/* MEDICINES */
 
-    padding: 70px 25px;
+.medicine-grid {
+    display: grid;
 
-    border: 2px dashed #cddbd1;
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 20px;
+
+    margin-top: 40px;
+}
+
+
+.medicine-card {
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 20px;
+
+    border: 1px solid #e1e9e3;
 
     border-radius: 18px;
 
-    text-align: center;
+    background-color: #ffffff;
+
+    transition: 0.2s;
+}
+
+
+.medicine-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow: 0 15px 35px rgba(20, 70, 40, 0.08);
+}
+
+
+.medicine-image {
+    height: 150px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 20px;
+
+    border-radius: 14px;
+
+    background-color: #f0f8f3;
+
+    font-size: 55px;
+}
+
+
+.medicine-category {
+    margin-bottom: 8px;
+
+    color: #18864b;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+.medicine-card h3 {
+    margin-bottom: 5px;
+
+    color: #163d28;
+
+    font-size: 21px;
+}
+
+
+.medicine-substance {
+    min-height: 24px;
+
+    margin-bottom: 15px;
+
+    color: #758078;
+
+    font-size: 14px;
+}
+
+
+.medicine-info {
+    display: flex;
+
+    gap: 8px;
+
+    margin-bottom: 18px;
 
     color: #68756c;
 
-    background-color: #fafcfb;
+    font-size: 13px;
+}
+
+
+.medicine-info span {
+    padding: 5px 8px;
+
+    border-radius: 7px;
+
+    background-color: #f2f6f3;
+}
+
+
+.medicine-status {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-bottom: 20px;
+}
+
+
+.prescription,
+.stock {
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+
+.prescription-free {
+    background-color: #e7f6ec;
+
+    color: #177343;
+}
+
+
+.prescription-required {
+    background-color: #fff0dc;
+
+    color: #a45d09;
+}
+
+
+.available {
+    background-color: #e8f6ec;
+
+    color: #177343;
+}
+
+
+.unavailable {
+    background-color: #fde9e9;
+
+    color: #a42e2e;
+}
+
+
+.medicine-bottom {
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: auto;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #edf1ee;
+}
+
+
+.medicine-price {
+    color: #163d28;
+
+    font-size: 22px;
+}
+
+
+.medicine-bottom small {
+    color: #78837b;
 }
 
 
@@ -459,6 +631,10 @@ body {
 
 @media (max-width: 900px) {
 
+    .medicine-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .navigation {
         gap: 14px;
 
@@ -489,6 +665,10 @@ body {
 
 
 @media (max-width: 650px) {
+
+    .medicine-grid {
+        grid-template-columns: 1fr;
+    }
 
     .header-content {
         flex-direction: column;
@@ -534,4 +714,21 @@ body {
         gap: 15px;
     }
 
+}
+
+.medicine-icon {
+    width: 60px;
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background-color: #18864b;
+    color: #ffffff;
+
+    font-size: 42px;
+    font-weight: bold;
 }
