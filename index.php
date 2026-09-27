@@ -388,6 +388,13 @@ $medicines = $stmt->fetchAll();
                     </small>
 
                 </div>
+                <button
+                    type="button"
+                    class="medicine-info-button"
+                    data-medicine-name="<?= htmlspecialchars($medicine['name']) ?>"
+                >
+                    Vairāk informācijas
+                </button>
 
             </article>
 

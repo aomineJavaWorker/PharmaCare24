@@ -692,6 +692,30 @@ body {
     transform: translateY(-2px);
 }
 
+.medicine-info-button {
+    width: 100%;
+
+    margin-top: 15px;
+    padding: 11px 14px;
+
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+
+    background-color: transparent;
+    color: var(--primary);
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.medicine-info-button:hover {
+    background-color: var(--primary);
+    color: #ffffff;
+}
 
 /* RESPONSIVE */
 
