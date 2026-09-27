@@ -78,6 +78,15 @@ $medicines = $stmt->fetchAll();
 
         </nav>
 
+        <button
+            id="themeButton"
+            class="theme-button"
+            type="button"
+            title="Tumšais režīms"
+        >
+            ☾
+        </button>
+
     </div>
 
 </header>
@@ -487,7 +496,7 @@ $medicines = $stmt->fetchAll();
     </div>
 
 </footer>
-
+<script src="assets/js/theme.js"></script>
 </body>
 
 </html>
