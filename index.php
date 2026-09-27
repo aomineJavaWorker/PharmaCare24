@@ -486,6 +486,34 @@ $medicines = $stmt->fetchAll();
 
 </main>
 
+<div
+    id="medicineModal"
+    class="medicine-modal"
+>
+
+    <div class="medicine-modal-content">
+
+        <button
+            type="button"
+            id="medicineModalClose"
+            class="medicine-modal-close"
+            aria-label="Aizvērt"
+        >
+            ×
+        </button>
+
+
+        <div id="medicineModalBody">
+
+            <p>
+                Ielādē informāciju...
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
 
 <footer class="footer">
 
@@ -504,6 +532,7 @@ $medicines = $stmt->fetchAll();
 
 </footer>
 <script src="assets/js/theme.js"></script>
+<script src="assets/js/medicine-api.js"></script>
 </body>
 
 </html>
