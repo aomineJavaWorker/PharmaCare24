@@ -30,15 +30,19 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <body>
 
 
-<header class="admin-header">
+<div class="admin-layout">
 
-    <div class="admin-container">
+
+    <!-- SIDEBAR -->
+
+    <aside class="admin-sidebar">
 
         <a
             href="dashboard.php"
             class="admin-logo"
         >
             <span>+</span>
+
             Aptieka
         </a>
 
@@ -78,36 +82,53 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
         </nav>
 
+    </aside>
 
-        <div class="admin-user">
+
+    <!-- RIGHT SIDE -->
+
+    <div class="admin-page">
+
+
+        <header class="admin-topbar">
 
             <div>
 
                 <strong>
-                    <?= htmlspecialchars($_SESSION['username']) ?>
+                    Vadības panelis
                 </strong>
-
-                <small>
-                    <?= htmlspecialchars($_SESSION['role']) ?>
-                </small>
 
             </div>
 
 
-            <a
-                href="logout.php"
-                class="logout-button"
-            >
-                Iziet
-            </a>
+            <div class="admin-user">
 
-        </div>
+                <div>
 
-    </div>
+                    <span>
+                        Sveiki,
+                        <?= htmlspecialchars($_SESSION['username']) ?>!
+                    </span>
 
-</header>
+                    <small>
+                        <?= htmlspecialchars($_SESSION['role']) ?>
+                    </small>
+
+                </div>
 
 
-<main class="admin-main">
+                <a
+                    href="logout.php"
+                    class="logout-button"
+                >
+                    Iziet
+                </a>
 
-    <div class="admin-container"></div>
+            </div>
+
+        </header>
+
+
+        <main class="admin-main">
+
+            <div class="admin-content">
