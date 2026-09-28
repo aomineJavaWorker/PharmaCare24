@@ -31,9 +31,8 @@ CREATE TABLE medicines (
 
     name VARCHAR(150) NOT NULL,
     active_substance VARCHAR(150) NULL,
+    api_search_name VARCHAR(150) NULL,
     manufacturer VARCHAR(150) NULL,
-    dosage_form VARCHAR(80) NULL,
-    strength VARCHAR(80) NULL,
 
     price DECIMAL(10,2) NOT NULL,
     stock_quantity INT UNSIGNED NOT NULL DEFAULT 0,

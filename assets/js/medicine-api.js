@@ -18,8 +18,24 @@ infoButtons.forEach(function (button) {
         const medicineName =
             button.dataset.medicineName;
 
+        const activeSubstance =
+            button.dataset.activeSubstance;
+
+        const apiSearchName =
+            button.dataset.apiSearchName;
+
 
         openModal();
+
+
+        if (!apiSearchName) {
+
+            showError(
+                'Šīm zālēm nav norādīts API meklēšanas nosaukums.'
+            );
+
+            return;
+        }
 
 
         showLoading(
@@ -27,15 +43,14 @@ infoButtons.forEach(function (button) {
         );
 
 
-        const query = encodeURIComponent(
-            `openfda.generic_name:"${medicineName}" OR openfda.brand_name:"${medicineName}"`
-        );
-
-
         try {
 
+            const encodedName =
+                encodeURIComponent(apiSearchName);
+
+
             const response = await fetch(
-                `https://api.fda.gov/drug/label.json?search=${query}&limit=1`
+                `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodedName}/property/Title,MolecularFormula,MolecularWeight,IUPACName/JSON`
             );
 
 
@@ -44,7 +59,7 @@ infoButtons.forEach(function (button) {
                 if (response.status === 404) {
 
                     showError(
-                        'Papildu informācija par šīm zālēm ārējā datu avotā netika atrasta.'
+                        'Papildu informācija par šīm zālēm PubChem datubāzē netika atrasta.'
                     );
 
                     return;
@@ -52,7 +67,7 @@ infoButtons.forEach(function (button) {
 
 
                 throw new Error(
-                    'API pieprasījuma kļūda.'
+                    'PubChem API pieprasījuma kļūda.'
                 );
             }
 
@@ -61,13 +76,24 @@ infoButtons.forEach(function (button) {
                 await response.json();
 
 
-            const medicine =
-                data.results[0];
+            const compound =
+                data.PropertyTable?.Properties?.[0];
+
+
+            if (!compound) {
+
+                showError(
+                    'PubChem neatgrieza informāciju par šo vielu.'
+                );
+
+                return;
+            }
 
 
             showMedicineInformation(
-                medicine,
-                medicineName
+                compound,
+                medicineName,
+                activeSubstance
             );
 
         } catch (error) {
@@ -76,7 +102,7 @@ infoButtons.forEach(function (button) {
 
 
             showError(
-                'Neizdevās iegūt informāciju no ārējā API. Lūdzu, mēģiniet vēlreiz vēlāk.'
+                'Neizdevās iegūt informāciju no PubChem API. Lūdzu, mēģiniet vēlreiz vēlāk.'
             );
         }
 
@@ -121,44 +147,45 @@ function showError(message) {
 
 
 function showMedicineInformation(
-    medicine,
-    searchedName
+    compound,
+    medicineName,
+    activeSubstance
 ) {
 
-    const genericName =
-        medicine.openfda?.generic_name?.[0]
-        ?? searchedName;
-
-
-    const brandName =
-        medicine.openfda?.brand_name?.[0]
+    const pubChemName =
+        compound.Title
         ?? 'Nav norādīts';
 
 
-    const manufacturer =
-        medicine.openfda?.manufacturer_name?.[0]
+    const formula =
+        compound.MolecularFormula
         ?? 'Nav norādīts';
 
 
-    const route =
-        medicine.openfda?.route?.[0]
+    const molecularWeight =
+        compound.MolecularWeight
         ?? 'Nav norādīts';
 
 
-    const purpose =
-        medicine.purpose?.[0]
-        ?? 'Informācija nav pieejama';
+    const iupacName =
+        compound.IUPACName
+        ?? 'Nav norādīts';
+
+
+    const cid =
+        compound.CID
+        ?? 'Nav norādīts';
 
 
     medicineModalBody.innerHTML = `
 
         <h2 class="modal-medicine-title">
-            ${escapeHtml(genericName)}
+            ${escapeHtml(medicineName)}
         </h2>
 
 
         <p class="modal-medicine-subtitle">
-            Informācija no openFDA
+            Papildu informācija no PubChem
         </p>
 
 
@@ -167,37 +194,11 @@ function showMedicineInformation(
             <div class="modal-info-item">
 
                 <span>
-                    Zīmola nosaukums
-                </span>
-
-                <strong>
-                    ${escapeHtml(brandName)}
-                </strong>
-
-            </div>
-
-
-            <div class="modal-info-item">
-
-                <span>
-                    Ražotājs
-                </span>
-
-                <strong>
-                    ${escapeHtml(manufacturer)}
-                </strong>
-
-            </div>
-
-
-            <div class="modal-info-item">
-
-                <span>
                     Aktīvā viela
                 </span>
 
                 <strong>
-                    ${escapeHtml(genericName)}
+                    ${escapeHtml(activeSubstance)}
                 </strong>
 
             </div>
@@ -206,11 +207,37 @@ function showMedicineInformation(
             <div class="modal-info-item">
 
                 <span>
-                    Lietošanas veids
+                    PubChem nosaukums
                 </span>
 
                 <strong>
-                    ${escapeHtml(route)}
+                    ${escapeHtml(pubChemName)}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info-item">
+
+                <span>
+                    Molekulārā formula
+                </span>
+
+                <strong>
+                    ${escapeHtml(formula)}
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info-item">
+
+                <span>
+                    Molekulmasa
+                </span>
+
+                <strong>
+                    ${escapeHtml(String(molecularWeight))} g/mol
                 </strong>
 
             </div>
@@ -221,13 +248,24 @@ function showMedicineInformation(
         <div class="modal-description">
 
             <h4>
-                Lietošanas mērķis
+                IUPAC nosaukums
             </h4>
 
             <p>
-                ${escapeHtml(
-                    shortenText(purpose, 700)
-                )}
+                ${escapeHtml(iupacName)}
+            </p>
+
+        </div>
+
+
+        <div class="modal-description">
+
+            <h4>
+                PubChem CID
+            </h4>
+
+            <p>
+                ${escapeHtml(String(cid))}
             </p>
 
         </div>
@@ -235,32 +273,13 @@ function showMedicineInformation(
     `;
 }
 
-function shortenText(
-    text,
-    maxLength
-) {
-
-    if (text.length <= maxLength) {
-        return text;
-    }
-
-
-    return text.substring(
-        0,
-        maxLength
-    ) + '...';
-}
-
-
 function escapeHtml(value) {
 
     const element =
         document.createElement('div');
 
-
     element.textContent =
-        value;
-
+        value ?? '';
 
     return element.innerHTML;
 }

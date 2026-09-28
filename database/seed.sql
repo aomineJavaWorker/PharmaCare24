@@ -13,6 +13,7 @@ INSERT INTO medicines
     category_id,
     name,
     active_substance,
+    api_search_name,
     manufacturer,
     dosage_form,
     strength,
@@ -21,21 +22,35 @@ INSERT INTO medicines
     prescription_required
 )
 VALUES
-(1, 'Paracetamol', 'Paracetamols', 'Olainfarm', 'Tabletes', '500 mg', 2.49, 120, 0),
-(1, 'Ibuprofen', 'Ibuprofēns', 'Grindeks', 'Tabletes', '400 mg', 3.19, 85, 0),
-(2, 'Vitamin D3', 'Holekalciferols', 'Walmark', 'Kapsulas', '2000 SV', 6.99, 60, 0),
-(3, 'Cetirizin', 'Cetirizīns', 'Teva', 'Tabletes', '10 mg', 5.10, 42, 0),
-(4, 'Otrivin', 'Ksilometazolīns', 'Haleon', 'Deguna aerosols', '0.1%', 4.89, 35, 0),
-(4, 'Strepsils', 'Amilmetakrezols', 'Reckitt', 'Pastilas', '-', 5.49, 55, 0),
-(5, 'Smecta', 'Diosmektīts', 'Ipsen', 'Pulveris', '3 g', 7.20, 25, 0),
-(1, 'Voltaren', 'Diklofenaks', 'Haleon', 'Gēls', '2%', 8.90, 18, 0),
-(2, 'Magne B6', 'Magnijs un B6 vitamīns', 'Sanofi', 'Tabletes', '-', 9.40, 44, 0),
-(3, 'Suprastin', 'Hloropiramīns', 'Egis', 'Tabletes', '25 mg', 4.20, 20, 1),
-(4, 'Septolete', 'Benzidamīns', 'KRKA', 'Pastilas', '-', 5.99, 38, 0),
-(1, 'No-Spa', 'Drotaverīns', 'Sanofi', 'Tabletes', '40 mg', 4.70, 47, 0),
-(1, 'Aspirin', 'Acetilsalicilskābe', 'Bayer', 'Tabletes', '500 mg', 3.50, 70, 0),
-(4, 'ACC', 'Acetilcisteīns', 'Sandoz', 'Putojošās tabletes', '600 mg', 7.80, 30, 0),
-(2, 'Vitamin C', 'Askorbīnskābe', 'Walmark', 'Tabletes', '500 mg', 4.99, 90, 0);
+(1, 'Paracetamol', 'Paracetamols', 'paracetamol', 'Olainfarm', 'Tabletes', '500 mg', 2.49, 120, 0),
+
+(1, 'Ibuprofen', 'Ibuprofēns', 'ibuprofen', 'Grindeks', 'Tabletes', '400 mg', 3.19, 85, 0),
+
+(2, 'Vitamin D3', 'Holekalciferols', 'cholecalciferol', 'Walmark', 'Kapsulas', '2000 SV', 6.99, 60, 0),
+
+(3, 'Cetirizin', 'Cetirizīns', 'cetirizine', 'Teva', 'Tabletes', '10 mg', 5.10, 42, 0),
+
+(4, 'Otrivin', 'Ksilometazolīns', 'xylometazoline', 'Haleon', 'Deguna aerosols', '0.1%', 4.89, 35, 0),
+
+(4, 'Strepsils', 'Amilmetakrezols', 'amylmetacresol', 'Reckitt', 'Pastilas', '-', 5.49, 55, 0),
+
+(5, 'Smecta', 'Diosmektīts', 'diosmectite', 'Ipsen', 'Pulveris', '3 g', 7.20, 25, 0),
+
+(1, 'Voltaren', 'Diklofenaks', 'diclofenac', 'Haleon', 'Gēls', '2%', 8.90, 18, 0),
+
+(2, 'Magne B6', 'Magnijs un B6 vitamīns', 'pyridoxine', 'Sanofi', 'Tabletes', '-', 9.40, 44, 0),
+
+(3, 'Suprastin', 'Hloropiramīns', 'chloropyramine', 'Egis', 'Tabletes', '25 mg', 4.20, 20, 1),
+
+(4, 'Septolete', 'Benzidamīns', 'benzydamine', 'KRKA', 'Pastilas', '-', 5.99, 38, 0),
+
+(1, 'No-Spa', 'Drotaverīns', 'drotaverine', 'Sanofi', 'Tabletes', '40 mg', 4.70, 47, 0),
+
+(1, 'Aspirin', 'Acetilsalicilskābe', 'acetylsalicylic acid', 'Bayer', 'Tabletes', '500 mg', 3.50, 70, 0),
+
+(4, 'ACC', 'Acetilcisteīns', 'acetylcysteine', 'Sandoz', 'Putojošās tabletes', '600 mg', 7.80, 30, 0),
+
+(2, 'Vitamin C', 'Askorbīnskābe', 'ascorbic acid', 'Walmark', 'Tabletes', '500 mg', 4.99, 90, 0);
 
 INSERT INTO prescriptions
 (

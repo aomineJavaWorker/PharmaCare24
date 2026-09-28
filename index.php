@@ -6,6 +6,7 @@ $stmt = $pdo->query(
     'SELECT
         medicines.id,
         medicines.name,
+        medicines.api_search_name,
         medicines.active_substance,
         medicines.manufacturer,
         medicines.dosage_form,
@@ -393,6 +394,8 @@ $medicines = $stmt->fetchAll();
                         class="medicine-info-button"
                         data-medicine-name="<?= htmlspecialchars($medicine['name']) ?>"
                         data-active-substance="<?= htmlspecialchars($medicine['active_substance'] ?? '') ?>"
+                        data-api-search-name="<?= htmlspecialchars(
+                        $medicine['api_search_name'] ?? '') ?>"
                     >
                         Vairāk informācijas
                     </button>
