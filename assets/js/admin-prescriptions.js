@@ -8,8 +8,41 @@ const prescriptionMessage =
     document.getElementById('prescriptionMessage');
 
 
+const openPrescriptionModal =
+    document.getElementById('openPrescriptionModal');
+
+const prescriptionModal =
+    document.getElementById('prescriptionModal');
+
+const closePrescriptionModal =
+    document.getElementById('closePrescriptionModal');
+
+const cancelPrescriptionModal =
+    document.getElementById('cancelPrescriptionModal');
+
+
+const prescriptionForm =
+    document.getElementById('prescriptionForm');
+
+const prescriptionFormMessage =
+    document.getElementById('prescriptionFormMessage');
+
+const prescriptionId =
+    document.getElementById('prescriptionId');
+
+const prescriptionModalTitle =
+    document.getElementById('prescriptionModalTitle');
+
+const medicineSelect =
+    document.getElementById('medicineId');
+
+
 loadPrescriptions();
 
+
+/* =========================
+   RECEPŠU IELĀDE
+   ========================= */
 
 async function loadPrescriptions() {
 
@@ -52,8 +85,10 @@ async function loadPrescriptions() {
         renderPrescriptions(
             result.data
         );
+
+
         renderMedicineOptions(
-            result.medicines
+            result.medicines ?? []
         );
 
 
@@ -61,6 +96,9 @@ async function loadPrescriptions() {
 
         console.error(error);
 
+
+        prescriptionMessage.style.display =
+            'block';
 
         prescriptionMessage.textContent =
             'Neizdevās ielādēt receptes.';
@@ -71,6 +109,11 @@ async function loadPrescriptions() {
     }
 }
 
+
+/* =========================
+   RECEPŠU TABULA
+   ========================= */
+
 function renderPrescriptions(prescriptions) {
 
     prescriptionTableBody.innerHTML = '';
@@ -80,6 +123,9 @@ function renderPrescriptions(prescriptions) {
 
 
     if (prescriptions.length === 0) {
+
+        prescriptionMessage.style.display =
+            'block';
 
         prescriptionMessage.textContent =
             'Receptes nav atrastas.';
@@ -163,15 +209,52 @@ function renderPrescriptions(prescriptions) {
 
                 </td>
 
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="
+                            table-action-button
+                            edit-prescription-button
+                        "
+                    >
+                        Rediģēt
+                    </button>
+
+                </td>
+
             `;
 
 
             prescriptionTableBody.appendChild(
                 row
             );
+
+
+            const editButton =
+                row.querySelector(
+                    '.edit-prescription-button'
+                );
+
+
+            editButton.addEventListener(
+                'click',
+                function () {
+
+                    openEditPrescription(
+                        prescription.id
+                    );
+                }
+            );
         }
     );
 }
+
+
+/* =========================
+   STATUSA KRĀSA
+   ========================= */
 
 function getStatusClass(status) {
 
@@ -179,7 +262,8 @@ function getStatusClass(status) {
         'Aktīva': 'status-aktīva',
         'Izmantota': 'status-izmantota',
         'Atcelta': 'status-atcelta',
-        'Beidzies termiņš': 'status-beidzies-termiņš'
+        'Beidzies termiņš':
+            'status-beidzies-termiņš'
     };
 
 
@@ -187,41 +271,11 @@ function getStatusClass(status) {
 }
 
 
-function escapeHtml(value) {
+/* =========================
+   ZĀĻU SELECT
+   ========================= */
 
-    const element =
-        document.createElement('div');
-
-
-    element.textContent =
-        value ?? '';
-
-
-    return element.innerHTML;
-}
-
-const openPrescriptionModal =
-    document.getElementById('openPrescriptionModal');
-
-const prescriptionModal =
-    document.getElementById('prescriptionModal');
-
-const closePrescriptionModal =
-    document.getElementById('closePrescriptionModal');
-
-const cancelPrescriptionModal =
-    document.getElementById('cancelPrescriptionModal');
-
-const prescriptionForm =
-    document.getElementById('prescriptionForm');
-
-const prescriptionFormMessage =
-    document.getElementById('prescriptionFormMessage');
-
-const medicineSelect =
-    document.getElementById('medicineId');
-
-    function renderMedicineOptions(medicines) {
+function renderMedicineOptions(medicines) {
 
     medicineSelect.innerHTML = '';
 
@@ -239,37 +293,61 @@ const medicineSelect =
     );
 
 
-    medicines.forEach(function (medicine) {
+    medicines.forEach(
+        function (medicine) {
 
-        const option =
-            document.createElement('option');
-
-
-        option.value =
-            medicine.id;
+            const option =
+                document.createElement('option');
 
 
-        if (medicine.strength) {
+            option.value =
+                medicine.id;
 
-            option.textContent =
-                `${medicine.name} (${medicine.strength})`;
 
-        } else {
+            if (
+                medicine.strength &&
+                medicine.strength !== '-'
+            ) {
 
-            option.textContent =
-                medicine.name;
+                option.textContent =
+                    `${medicine.name} (${medicine.strength})`;
+
+            } else {
+
+                option.textContent =
+                    medicine.name;
+            }
+
+
+            medicineSelect.appendChild(
+                option
+            );
         }
-
-
-        medicineSelect.appendChild(
-            option
-        );
-    });
+    );
 }
+
+
+/* =========================
+   JAUNAS RECEPTES MODAL
+   ========================= */
 
 openPrescriptionModal.addEventListener(
     'click',
     function () {
+
+        prescriptionForm.reset();
+
+        prescriptionId.value = '';
+
+        prescriptionModalTitle.textContent =
+            'Pievienot recepti';
+
+        prescriptionFormMessage.textContent =
+            '';
+
+        prescriptionFormMessage.className =
+            'form-message';
+
 
         prescriptionModal.classList.add(
             'active'
@@ -281,6 +359,125 @@ openPrescriptionModal.addEventListener(
 );
 
 
+/* =========================
+   REDIĢĒŠANAS MODAL
+   ========================= */
+
+async function openEditPrescription(id) {
+
+    try {
+
+        const response = await fetch(
+            `../api/prescriptions.php?id=${id}`
+        );
+
+
+        if (response.status === 401) {
+
+            window.location.href =
+                'login.php';
+
+            return;
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            alert(
+                result.message
+                ?? 'Neizdevās ielādēt recepti.'
+            );
+
+            return;
+        }
+
+
+        const prescription =
+            result.data;
+
+
+        prescriptionId.value =
+            prescription.id;
+
+        document.getElementById(
+            'prescriptionNumber'
+        ).value =
+            prescription.prescription_number;
+
+        document.getElementById(
+            'patientName'
+        ).value =
+            prescription.patient_name;
+
+        document.getElementById(
+            'doctorName'
+        ).value =
+            prescription.doctor_name;
+
+        document.getElementById(
+            'issuedAt'
+        ).value =
+            prescription.issued_at;
+
+        document.getElementById(
+            'validUntil'
+        ).value =
+            prescription.valid_until;
+
+        document.getElementById(
+            'status'
+        ).value =
+            prescription.status;
+
+        medicineSelect.value =
+            prescription.medicine_id;
+
+        document.getElementById(
+            'quantity'
+        ).value =
+            prescription.quantity;
+
+
+        prescriptionModalTitle.textContent =
+            'Rediģēt recepti';
+
+        prescriptionFormMessage.textContent =
+            '';
+
+        prescriptionFormMessage.className =
+            'form-message';
+
+
+        prescriptionModal.classList.add(
+            'active'
+        );
+
+        document.body.style.overflow =
+            'hidden';
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'Neizdevās sazināties ar serveri.'
+        );
+    }
+}
+
+
+/* =========================
+   MODAL AIZVĒRŠANA
+   ========================= */
+
 function closeModal() {
 
     prescriptionModal.classList.remove(
@@ -291,7 +488,13 @@ function closeModal() {
 
     prescriptionForm.reset();
 
-    prescriptionFormMessage.textContent = '';
+    prescriptionId.value = '';
+
+    prescriptionModalTitle.textContent =
+        'Pievienot recepti';
+
+    prescriptionFormMessage.textContent =
+        '';
 
     prescriptionFormMessage.className =
         'form-message';
@@ -340,6 +543,11 @@ document.addEventListener(
     }
 );
 
+
+/* =========================
+   PIEVIENOŠANA / REDIĢĒŠANA
+   ========================= */
+
 prescriptionForm.addEventListener(
     'submit',
     async function (event) {
@@ -348,7 +556,9 @@ prescriptionForm.addEventListener(
 
 
         const formData =
-            new FormData(prescriptionForm);
+            new FormData(
+                prescriptionForm
+            );
 
 
         const data =
@@ -364,19 +574,35 @@ prescriptionForm.addEventListener(
             Number(data.medicine_id);
 
 
+        const isEditing =
+            prescriptionId.value !== '';
+
+
+        if (isEditing) {
+
+            data.id =
+                Number(
+                    prescriptionId.value
+                );
+        }
+
+
         try {
 
             const response = await fetch(
                 '../api/prescriptions.php',
                 {
-                    method: 'POST',
+                    method: isEditing
+                        ? 'PUT'
+                        : 'POST',
 
                     headers: {
                         'Content-Type':
                             'application/json'
                     },
 
-                    body: JSON.stringify(data)
+                    body:
+                        JSON.stringify(data)
                 }
             );
 
@@ -394,7 +620,10 @@ prescriptionForm.addEventListener(
                 await response.json();
 
 
-            if (!response.ok || !result.success) {
+            if (
+                !response.ok ||
+                !result.success
+            ) {
 
                 showFormMessage(
                     result.message
@@ -434,6 +663,11 @@ prescriptionForm.addEventListener(
     }
 );
 
+
+/* =========================
+   PAZIŅOJUMI
+   ========================= */
+
 function showFormMessage(
     message,
     type
@@ -444,4 +678,22 @@ function showFormMessage(
 
     prescriptionFormMessage.className =
         `form-message ${type}`;
+}
+
+
+/* =========================
+   XSS AIZSARDZĪBA
+   ========================= */
+
+function escapeHtml(value) {
+
+    const element =
+        document.createElement('div');
+
+
+    element.textContent =
+        value ?? '';
+
+
+    return element.innerHTML;
 }

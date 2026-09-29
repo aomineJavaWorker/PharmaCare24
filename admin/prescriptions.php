@@ -73,6 +73,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
                     <th>Izrakstīta</th>
                     <th>Derīga līdz</th>
                     <th>Statuss</th>
+                    <th>Darbības</th>
                 </tr>
 
             </thead>
@@ -96,35 +97,41 @@ require_once __DIR__ . '/../includes/admin_header.php';
     class="admin-modal"
 >
 
-    <div class="admin-modal-content">
+        <div class="admin-modal-content">
 
-        <div class="admin-modal-header">
+            <div class="admin-modal-header">
 
-            <div>
+        <div>
 
-                <h2>
-                    Pievienot recepti
-                </h2>
+            <h2 id="prescriptionModalTitle">
+                Pievienot recepti
+            </h2>
 
-                <p>
-                    Ievadiet receptes informāciju.
-                </p>
-
-            </div>
-
-
-            <button
-                type="button"
-                id="closePrescriptionModal"
-                class="admin-modal-close"
-            >
-                ×
-            </button>
+            <p>
+                Ievadiet receptes informāciju.
+            </p>
 
         </div>
 
 
+        <button
+            type="button"
+            id="closePrescriptionModal"
+            class="admin-modal-close"
+        >
+            ×
+        </button>
+
+    </div>
+
+
         <form id="prescriptionForm">
+
+                <input
+            type="hidden"
+            id="prescriptionId"
+            name="id"
+        >
 
             <div
                 id="prescriptionFormMessage"
