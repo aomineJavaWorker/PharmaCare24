@@ -1,51 +1,91 @@
 <?php
 
-require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/admin_header.php';
 
-
-$stmt = $pdo->query(
-    "SELECT
-        prescriptions.id,
-        prescriptions.prescription_number,
-        prescriptions.patient_name,
-        prescriptions.doctor_name,
-        prescriptions.issued_at,
-        prescriptions.valid_until,
-        prescriptions.status,
-
-        GROUP_CONCAT(
-            CONCAT(
-                medicines.name,
-                ' × ',
-                prescription_items.quantity
-            )
-            ORDER BY medicines.name
-            SEPARATOR ', '
-        ) AS medicines
-
-    FROM prescriptions
-
-    LEFT JOIN prescription_items
-        ON prescriptions.id = prescription_items.prescription_id
-
-    LEFT JOIN medicines
-        ON prescription_items.medicine_id = medicines.id
-
-    GROUP BY
-        prescriptions.id,
-        prescriptions.prescription_number,
-        prescriptions.patient_name,
-        prescriptions.doctor_name,
-        prescriptions.issued_at,
-        prescriptions.valid_until,
-        prescriptions.status
-
-    ORDER BY prescriptions.created_at DESC"
-);
+?>
 
 
-$prescriptions = $stmt->fetchAll();
+<div class="page-header">
+
+    <div>
+
+        <h1>Receptes</h1>
+
+        <p>
+            Aptiekā reģistrēto recepšu pārvaldība.
+        </p>
+
+    </div>
+
+</div>
+
+
+<section class="admin-panel">
+
+    <div class="admin-panel-header">
+
+        <div>
+
+            <h2>
+                Reģistrētās receptes
+            </h2>
+
+            <p>
+                Kopā:
+                <strong id="prescriptionCount">
+                    0
+                </strong>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="prescriptionMessage"
+        class="table-message"
+    >
+        Ielādē receptes...
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="admin-table">
+
+            <thead>
+
+                <tr>
+                    <th>Nr.</th>
+                    <th>Pacients</th>
+                    <th>Ārsts</th>
+                    <th>Zāles</th>
+                    <th>Izrakstīta</th>
+                    <th>Derīga līdz</th>
+                    <th>Statuss</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody id="prescriptionTableBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<script src="../assets/js/admin-prescriptions.js"></script>
+
+
+<?php
+
+require_once __DIR__ . '/../includes/admin_footer.php';
 
 ?>
 

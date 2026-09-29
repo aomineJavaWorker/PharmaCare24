@@ -829,6 +829,27 @@ body {
     color: #9a5a0b;
 }
 
+.table-message {
+    margin-bottom: 20px;
+
+    padding: 14px;
+
+    border-radius: 9px;
+
+    background-color: #eef5f0;
+
+    color: #617067;
+
+    font-size: 14px;
+}
+
+
+.table-message.error {
+    background-color: #fde9e9;
+
+    color: #a42e2e;
+}
+
 
 /* RESPONSIVE */
 
