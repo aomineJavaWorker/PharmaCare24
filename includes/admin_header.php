@@ -25,6 +25,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         href="../assets/css/admin.css"
     >
 
+    <script>
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+</script>
+
 </head>
 
 <body>
