@@ -212,15 +212,31 @@ function renderPrescriptions(prescriptions) {
 
                 <td>
 
-                    <button
-                        type="button"
-                        class="
-                            table-action-button
-                            edit-prescription-button
-                        "
-                    >
-                        Rediģēt
-                    </button>
+                    <div class="table-actions">
+
+                        <button
+                            type="button"
+                            class="
+                                table-action-button
+                                edit-prescription-button
+                            "
+                        >
+                            Rediģēt
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="
+                                table-action-button
+                                delete-action-button
+                                delete-prescription-button
+                            "
+                        >
+                            Dzēst
+                        </button>
+
+                    </div>
 
                 </td>
 
@@ -244,6 +260,22 @@ function renderPrescriptions(prescriptions) {
 
                     openEditPrescription(
                         prescription.id
+                    );
+                }
+            );
+            const deleteButton =
+                row.querySelector(
+                    '.delete-prescription-button'
+                );
+
+
+            deleteButton.addEventListener(
+                'click',
+                function () {
+
+                    deletePrescription(
+                        prescription.id,
+                        prescription.prescription_number
                     );
                 }
             );
@@ -663,6 +695,84 @@ prescriptionForm.addEventListener(
     }
 );
 
+
+/* =========================
+   RECEPTES DZĒŠANA
+   ========================= */
+
+async function deletePrescription(
+    id,
+    prescriptionNumber
+) {
+
+    const confirmed = confirm(
+        `Vai tiešām vēlaties dzēst recepti ${prescriptionNumber}?`
+    );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            '../api/prescriptions.php',
+            {
+                method: 'DELETE',
+
+                headers: {
+                    'Content-Type':
+                        'application/json'
+                },
+
+                body: JSON.stringify({
+                    id: id
+                })
+            }
+        );
+
+
+        if (response.status === 401) {
+
+            window.location.href =
+                'login.php';
+
+            return;
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            alert(
+                result.message
+                ?? 'Neizdevās dzēst recepti.'
+            );
+
+            return;
+        }
+
+
+        await loadPrescriptions();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'Neizdevās sazināties ar serveri.'
+        );
+    }
+}
 
 /* =========================
    PAZIŅOJUMI

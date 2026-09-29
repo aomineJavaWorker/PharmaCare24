@@ -426,6 +426,7 @@ if ($method === 'POST') {
 }
 
 
+
 /* =========================================================
    PUT - RECEPTES REDIĢĒŠANA
    ========================================================= */
@@ -708,6 +709,125 @@ if ($method === 'PUT') {
     }
 }
 
+/* =========================================================
+   DELETE - RECEPTES DZĒŠANA
+   ========================================================= */
+
+if ($method === 'DELETE') {
+
+    $data = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
+
+
+    if (!is_array($data)) {
+
+        jsonResponse([
+            'success' => false,
+            'message' =>
+                'Nederīgi nosūtītie dati.'
+        ], 400);
+    }
+
+
+    $id =
+        (int) ($data['id'] ?? 0);
+
+
+    if ($id <= 0) {
+
+        jsonResponse([
+            'success' => false,
+            'message' =>
+                'Nederīgs receptes ID.'
+        ], 422);
+    }
+
+
+    $checkPrescription = $pdo->prepare(
+        'SELECT id
+         FROM prescriptions
+         WHERE id = ?
+         LIMIT 1'
+    );
+
+
+    $checkPrescription->execute([
+        $id
+    ]);
+
+
+    if (!$checkPrescription->fetch()) {
+
+        jsonResponse([
+            'success' => false,
+            'message' =>
+                'Recepte nav atrasta.'
+        ], 404);
+    }
+
+
+    try {
+
+        $pdo->beginTransaction();
+
+
+        /*
+            Vispirms dzēšam receptes zāļu ierakstus,
+            jo tie ir saistīti ar recepti.
+        */
+
+        $itemStmt = $pdo->prepare(
+            'DELETE FROM prescription_items
+             WHERE prescription_id = ?'
+        );
+
+
+        $itemStmt->execute([
+            $id
+        ]);
+
+
+        /*
+            Pēc tam dzēšam pašu recepti.
+        */
+
+        $stmt = $pdo->prepare(
+            'DELETE FROM prescriptions
+             WHERE id = ?'
+        );
+
+
+        $stmt->execute([
+            $id
+        ]);
+
+
+        $pdo->commit();
+
+
+        jsonResponse([
+            'success' => true,
+            'message' =>
+                'Recepte veiksmīgi dzēsta.'
+        ]);
+
+
+    } catch (PDOException $e) {
+
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+
+        jsonResponse([
+            'success' => false,
+            'message' =>
+                'Neizdevās dzēst recepti.'
+        ], 500);
+    }
+}
 
 /* =========================================================
    NEATĻAUTA METODE

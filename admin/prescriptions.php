@@ -90,48 +90,52 @@ require_once __DIR__ . '/../includes/admin_header.php';
 </section>
 
 
-<!-- MODAL -->
+<!-- RECEPTES MODĀLAIS LOGS -->
 
 <div
     id="prescriptionModal"
     class="admin-modal"
 >
 
-        <div class="admin-modal-content">
+    <div class="admin-modal-content">
 
-            <div class="admin-modal-header">
 
-        <div>
+        <div class="admin-modal-header">
 
-            <h2 id="prescriptionModalTitle">
-                Pievienot recepti
-            </h2>
+            <div>
 
-            <p>
-                Ievadiet receptes informāciju.
-            </p>
+                <h2 id="prescriptionModalTitle">
+                    Pievienot recepti
+                </h2>
+
+                <p>
+                    Ievadiet receptes informāciju.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="closePrescriptionModal"
+                class="admin-modal-close"
+                aria-label="Aizvērt"
+            >
+                ×
+            </button>
 
         </div>
 
 
-        <button
-            type="button"
-            id="closePrescriptionModal"
-            class="admin-modal-close"
-        >
-            ×
-        </button>
-
-    </div>
-
-
         <form id="prescriptionForm">
 
-                <input
-            type="hidden"
-            id="prescriptionId"
-            name="id"
-        >
+
+            <input
+                type="hidden"
+                id="prescriptionId"
+                name="id"
+            >
+
 
             <div
                 id="prescriptionFormMessage"
@@ -140,6 +144,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
 
             <div class="form-grid">
+
 
                 <div class="form-group">
 
@@ -293,6 +298,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
                 </div>
 
+
             </div>
 
 
@@ -315,6 +321,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
                 </button>
 
             </div>
+
 
         </form>
 

@@ -1101,6 +1101,32 @@ body {
 }
 
 
+.table-actions {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+}
+
+
+.delete-action-button {
+    border-color: #c64242;
+
+    color: #c64242;
+}
+
+
+.delete-action-button:hover {
+    border-color: #c64242;
+
+    background-color: #c64242;
+
+    color: #ffffff;
+}
+
 @media (max-width: 650px) {
 
     .form-grid {
