@@ -80,6 +80,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="lv">
 
 <head>
+    <link
+    rel="stylesheet"
+    href="../assets/css/admin.css"
+>
 
     <meta charset="UTF-8">
 
@@ -92,61 +96,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </head>
 
-<body>
+<body class="login-page">
 
-    <h1>Aptieka</h1>
+    <main class="login-wrapper">
 
-    <h2>Darbinieku autorizācija</h2>
+        <section class="login-card">
+
+            <div class="login-brand">
+
+                <span class="login-logo">
+                    +
+                </span>
+
+                <div>
+
+                    <h1>Aptieka</h1>
+
+                    <p>
+                        Pārvaldības sistēma
+                    </p>
+
+                </div>
+
+            </div>
 
 
-    <?php if ($error !== ''): ?>
+            <div class="login-heading">
 
-        <p>
-            <?= htmlspecialchars($error) ?>
-        </p>
+                <h2>
+                    Darbinieku autorizācija
+                </h2>
 
-    <?php endif; ?>
+                <p>
+                    Ievadiet savus piekļuves datus.
+                </p>
+
+            </div>
 
 
-    <form method="POST">
+            <?php if ($error !== ''): ?>
 
-        <div>
+                <div class="login-error">
 
-            <label for="username">
-                Lietotājvārds
-            </label>
+                    <?= htmlspecialchars($error) ?>
 
-            <input
-                type="text"
-                id="username"
-                name="username"
-                required
+                </div>
+
+            <?php endif; ?>
+
+
+            <form
+                method="POST"
+                class="login-form"
             >
 
-        </div>
+                <div class="form-group">
+
+                    <label for="username">
+                        Lietotājvārds
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        required
+                        autocomplete="username"
+                    >
+
+                </div>
 
 
-        <div>
+                <div class="form-group">
 
-            <label for="password">
-                Parole
-            </label>
+                    <label for="password">
+                        Parole
+                    </label>
 
-            <input
-                type="password"
-                id="password"
-                name="password"
-                required
-            >
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                    >
 
-        </div>
+                </div>
 
 
-        <button type="submit">
-            Ielogoties
-        </button>
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    Ielogoties
+                </button>
 
-    </form>
+            </form>
+
+        </section>
+
+    </main>
 
 </body>
 
