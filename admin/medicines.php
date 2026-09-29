@@ -4,50 +4,31 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
 ?>
 
-
 <div class="page-header">
-
     <div>
         <h1>Zāļu noliktava</h1>
         <p>Aptiekā pieejamo zāļu un to atlikumu pārvaldība.</p>
     </div>
 
-    <button
-        type="button"
-        id="openMedicineModal"
-        class="primary-admin-button"
-    >
+    <button type="button" id="openMedicineModal" class="primary-admin-button">
         + Pievienot zāles
     </button>
-
 </div>
 
-
 <section class="admin-panel">
-
     <div class="admin-panel-header">
-
         <div>
             <h2>Zāles</h2>
-
-            <p>
-                Kopā:
-                <strong id="medicineCount">0</strong>
-            </p>
+            <p>Kopā: <strong id="medicineCount">0</strong></p>
         </div>
-
     </div>
-
 
     <div id="medicineMessage" class="table-message">
         Ielādē zāles...
     </div>
 
-
     <div class="table-wrapper">
-
         <table class="admin-table">
-
             <thead>
                 <tr>
                     <th>ID</th>
@@ -57,24 +38,21 @@ require_once __DIR__ . '/../includes/admin_header.php';
                     <th>Cena</th>
                     <th>Daudzums</th>
                     <th>Recepte</th>
+                    <th>Darbības</th>
                 </tr>
             </thead>
 
             <tbody id="medicineTableBody"></tbody>
-
         </table>
-
     </div>
-
 </section>
 
 <div id="medicineModal" class="admin-modal">
-
     <div class="admin-modal-content">
 
         <div class="admin-modal-header">
             <div>
-                <h2>Pievienot zāles</h2>
+                <h2 id="medicineModalTitle">Pievienot zāles</h2>
                 <p>Ievadiet zāļu informāciju.</p>
             </div>
 
@@ -82,12 +60,19 @@ require_once __DIR__ . '/../includes/admin_header.php';
                 type="button"
                 id="closeMedicineModal"
                 class="admin-modal-close"
+                aria-label="Aizvērt"
             >
                 ×
             </button>
         </div>
 
         <form id="medicineForm">
+
+            <input
+                type="hidden"
+                id="medicineId"
+                name="id"
+            >
 
             <div
                 id="medicineFormMessage"
@@ -206,7 +191,6 @@ require_once __DIR__ . '/../includes/admin_header.php';
             </div>
 
             <div class="modal-actions">
-
                 <button
                     type="button"
                     id="cancelMedicineModal"
@@ -221,18 +205,13 @@ require_once __DIR__ . '/../includes/admin_header.php';
                 >
                     Saglabāt
                 </button>
-
             </div>
 
         </form>
-
     </div>
-
 </div>
 
-
 <script src="../assets/js/admin-medicines.js"></script>
-
 
 <?php
 
