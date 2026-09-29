@@ -14,6 +14,7 @@ $activePrescriptionCount = (int) $pdo
         SELECT COUNT(*)
         FROM prescriptions
         WHERE status = 'Aktīva'
+        AND deleted_at IS NULL
     ")
     ->fetchColumn();
 
