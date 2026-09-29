@@ -17,6 +17,15 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
     </div>
 
+
+    <button
+        type="button"
+        id="openPrescriptionModal"
+        class="primary-admin-button"
+    >
+        + Pievienot recepti
+    </button>
+
 </div>
 
 
@@ -80,151 +89,234 @@ require_once __DIR__ . '/../includes/admin_header.php';
 </section>
 
 
-<script src="../assets/js/admin-prescriptions.js"></script>
+<!-- MODAL -->
+
+<div
+    id="prescriptionModal"
+    class="admin-modal"
+>
+
+    <div class="admin-modal-content">
+
+        <div class="admin-modal-header">
+
+            <div>
+
+                <h2>
+                    Pievienot recepti
+                </h2>
+
+                <p>
+                    Ievadiet receptes informāciju.
+                </p>
+
+            </div>
 
 
-<?php
+            <button
+                type="button"
+                id="closePrescriptionModal"
+                class="admin-modal-close"
+            >
+                ×
+            </button>
 
-require_once __DIR__ . '/../includes/admin_footer.php';
-
-?>
+        </div>
 
 
-<div class="page-header">
+        <form id="prescriptionForm">
 
-    <div>
+            <div
+                id="prescriptionFormMessage"
+                class="form-message"
+            ></div>
 
-        <h1>Receptes</h1>
 
-        <p>
-            Aptiekā reģistrēto recepšu pārvaldība.
-        </p>
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="prescriptionNumber">
+                        Receptes numurs *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="prescriptionNumber"
+                        name="prescription_number"
+                        placeholder="R-2026-0016"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="status">
+                        Statuss *
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                        required
+                    >
+
+                        <option value="Aktīva">
+                            Aktīva
+                        </option>
+
+                        <option value="Izmantota">
+                            Izmantota
+                        </option>
+
+                        <option value="Atcelta">
+                            Atcelta
+                        </option>
+
+                        <option value="Beidzies termiņš">
+                            Beidzies termiņš
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="patientName">
+                        Pacients *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="patientName"
+                        name="patient_name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="doctorName">
+                        Ārsts *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="doctorName"
+                        name="doctor_name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="issuedAt">
+                        Izrakstīšanas datums *
+                    </label>
+
+                    <input
+                        type="date"
+                        id="issuedAt"
+                        name="issued_at"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="validUntil">
+                        Derīga līdz *
+                    </label>
+
+                    <input
+                        type="date"
+                        id="validUntil"
+                        name="valid_until"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="medicineId">
+                        Zāles *
+                    </label>
+
+                    <select
+                        id="medicineId"
+                        name="medicine_id"
+                        required
+                    >
+
+                        <option value="">
+                            Izvēlieties zāles
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="quantity">
+                        Daudzums *
+                    </label>
+
+                    <input
+                        type="number"
+                        id="quantity"
+                        name="quantity"
+                        value="1"
+                        min="1"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelPrescriptionModal"
+                    class="secondary-button"
+                >
+                    Atcelt
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-admin-button"
+                >
+                    Saglabāt
+                </button>
+
+            </div>
+
+        </form>
 
     </div>
 
 </div>
 
 
-<section class="admin-panel">
-
-    <div class="admin-panel-header">
-
-        <div>
-
-            <h2>Reģistrētās receptes</h2>
-
-            <p>
-                Kopā:
-                <strong>
-                    <?= count($prescriptions) ?>
-                </strong>
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="table-wrapper">
-
-        <table class="admin-table">
-
-            <thead>
-
-                <tr>
-                    <th>Nr.</th>
-                    <th>Pacients</th>
-                    <th>Ārsts</th>
-                    <th>Zāles</th>
-                    <th>Izrakstīta</th>
-                    <th>Derīga līdz</th>
-                    <th>Statuss</th>
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                <?php foreach ($prescriptions as $prescription): ?>
-
-                    <tr>
-
-                        <td>
-                            <strong>
-                                <?= htmlspecialchars(
-                                    $prescription['prescription_number']
-                                ) ?>
-                            </strong>
-                        </td>
-
-
-                        <td>
-                            <?= htmlspecialchars(
-                                $prescription['patient_name']
-                            ) ?>
-                        </td>
-
-
-                        <td>
-                            <?= htmlspecialchars(
-                                $prescription['doctor_name']
-                            ) ?>
-                        </td>
-
-
-                        <td>
-                            <?= htmlspecialchars(
-                                $prescription['medicines']
-                                ?? 'Zāles nav norādītas'
-                            ) ?>
-                        </td>
-
-
-                        <td>
-                            <?= htmlspecialchars(
-                                $prescription['issued_at']
-                            ) ?>
-                        </td>
-
-
-                        <td>
-                            <?= htmlspecialchars(
-                                $prescription['valid_until']
-                            ) ?>
-                        </td>
-
-
-                        <td>
-
-                            <span
-                                class="prescription-status
-                                status-<?= strtolower(
-                                    str_replace(
-                                        ' ',
-                                        '-',
-                                        $prescription['status']
-                                    )
-                                ) ?>"
-                            >
-                                <?= htmlspecialchars(
-                                    $prescription['status']
-                                ) ?>
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                <?php endforeach; ?>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</section>
+<script src="../assets/js/admin-prescriptions.js"></script>
 
 
 <?php
