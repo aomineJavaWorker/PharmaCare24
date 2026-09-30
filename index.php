@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/config/database.php';
 
+
 $stmt = $pdo->query(
     'SELECT
         medicines.id,
@@ -15,21 +16,24 @@ $stmt = $pdo->query(
         medicines.stock_quantity,
         medicines.prescription_required,
         categories.name AS category_name
-        FROM medicines
-        LEFT JOIN categories
-            ON medicines.category_id = categories.id
-        WHERE medicines.deleted_at IS NULL
-        ORDER BY medicines.name ASC'
+     FROM medicines
+     LEFT JOIN categories
+        ON medicines.category_id = categories.id
+     WHERE medicines.deleted_at IS NULL
+     ORDER BY medicines.name ASC'
 );
+
 
 $medicines = $stmt->fetchAll();
 
 ?>
 
 <!DOCTYPE html>
+
 <html lang="lv">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -43,18 +47,25 @@ $medicines = $stmt->fetchAll();
         rel="stylesheet"
         href="assets/css/style.css"
     >
+
 </head>
 
+
 <body>
+
 
 <header class="header">
 
     <div class="container header-content">
 
         <a href="#sakums" class="logo">
+
             <span class="logo-icon">+</span>
+
             Aptieka
+
         </a>
+
 
         <nav class="navigation">
 
@@ -80,14 +91,37 @@ $medicines = $stmt->fetchAll();
 
         </nav>
 
-        <button
-            id="themeButton"
-            class="theme-button"
-            type="button"
-            title="Tumšais režīms"
-        >
-            ☾
-        </button>
+
+        <div class="header-actions">
+
+            <button
+                id="cartButton"
+                class="cart-button"
+                type="button"
+                title="Grozs"
+            >
+                🛒
+
+                <span
+                    id="cartCount"
+                    class="cart-count"
+                >
+                    0
+                </span>
+
+            </button>
+
+
+            <button
+                id="themeButton"
+                class="theme-button"
+                type="button"
+                title="Tumšais režīms"
+            >
+                ☾
+            </button>
+
+        </div>
 
     </div>
 
@@ -95,6 +129,7 @@ $medicines = $stmt->fetchAll();
 
 
 <main>
+
 
     <!-- SĀKUMS -->
 
@@ -111,16 +146,19 @@ $medicines = $stmt->fetchAll();
                     Jūsu veselībai
                 </span>
 
+
                 <h1>
                     Jūsu veselība —
                     mūsu prioritāte
                 </h1>
+
 
                 <p>
                     Kvalitatīvi medikamenti, pārskatāma
                     informācija un rūpes par jūsu veselību
                     vienuviet.
                 </p>
+
 
                 <a
                     href="#zales"
@@ -166,9 +204,11 @@ $medicines = $stmt->fetchAll();
                 Par mums
             </span>
 
+
             <h2 class="section-title">
                 Aptieka, kurai var uzticēties
             </h2>
+
 
             <p class="section-description">
                 Mūsu mērķis ir nodrošināt klientiem
@@ -193,6 +233,7 @@ $medicines = $stmt->fetchAll();
             <span class="section-label">
                 Pakalpojumi
             </span>
+
 
             <h2 class="section-title">
                 Ko mēs piedāvājam?
@@ -276,136 +317,243 @@ $medicines = $stmt->fetchAll();
                 Katalogs
             </span>
 
+
             <h2 class="section-title">
                 Zāļu katalogs
             </h2>
 
+
             <p class="section-description">
-                Šajā sadaļā tiks attēlotas aptiekā
+                Šajā sadaļā attēlotas aptiekā
                 pieejamās zāles.
             </p>
 
 
             <div class="medicine-grid">
 
-        <?php foreach ($medicines as $medicine): ?>
 
-            <article class="medicine-card">
-
-                <div class="medicine-image">
-                    <span class="medicine-icon">+</span>
-                </div>
-
-                <span class="medicine-category">
-
-                    <?= htmlspecialchars(
-                        $medicine['category_name'] ?? 'Bez kategorijas'
-                    ) ?>
-
-                </span>
+                <?php foreach ($medicines as $medicine): ?>
 
 
-                <h3>
-                    <?= htmlspecialchars($medicine['name']) ?>
-                </h3>
+                    <article class="medicine-card">
 
 
-                <p class="medicine-substance">
+                        <div class="medicine-image">
 
-                    <?= htmlspecialchars(
-                        $medicine['active_substance'] ?? ''
-                    ) ?>
+                            <span class="medicine-icon">
+                                +
+                            </span>
 
-                </p>
-
-
-                <div class="medicine-info">
-
-                    <span>
-                        <?= htmlspecialchars(
-                            $medicine['dosage_form'] ?? ''
-                        ) ?>
-                    </span>
-
-                    <span>
-                        <?= htmlspecialchars(
-                            $medicine['strength'] ?? ''
-                        ) ?>
-                    </span>
-
-                </div>
+                        </div>
 
 
-                <div class="medicine-status">
+                        <span class="medicine-category">
 
-                    <?php if ($medicine['prescription_required']): ?>
+                            <?= htmlspecialchars(
+                                $medicine['category_name']
+                                ?? 'Bez kategorijas'
+                            ) ?>
 
-                        <span class="prescription prescription-required">
-                            Recepšu zāles
                         </span>
 
-                    <?php else: ?>
 
-                        <span class="prescription prescription-free">
-                            Bez receptes
-                        </span>
+                        <h3>
 
-                    <?php endif; ?>
+                            <?= htmlspecialchars(
+                                $medicine['name']
+                            ) ?>
 
-
-                    <?php if ($medicine['stock_quantity'] > 0): ?>
-
-                        <span class="stock available">
-                            Pieejams
-                        </span>
-
-                    <?php else: ?>
-
-                        <span class="stock unavailable">
-                            Nav pieejams
-                        </span>
-
-                    <?php endif; ?>
-
-                </div>
+                        </h3>
 
 
-                <div class="medicine-bottom">
+                        <p class="medicine-substance">
 
-                    <strong class="medicine-price">
+                            <?= htmlspecialchars(
+                                $medicine['active_substance']
+                                ?? ''
+                            ) ?>
 
-                        <?= number_format(
-                            (float) $medicine['price'],
-                            2,
-                            ',',
-                            ' '
-                        ) ?>
-                        €
+                        </p>
 
-                    </strong>
 
-                    <small>
-                        Noliktavā:
-                        <?= (int) $medicine['stock_quantity'] ?>
-                    </small>
+                        <div class="medicine-info">
 
-                </div>
-                    <button
-                        type="button"
-                        class="medicine-info-button"
-                        data-medicine-name="<?= htmlspecialchars($medicine['name']) ?>"
-                        data-active-substance="<?= htmlspecialchars($medicine['active_substance'] ?? '') ?>"
-                        data-api-search-name="<?= htmlspecialchars(
-                        $medicine['api_search_name'] ?? '') ?>"
-                    >
-                        Vairāk informācijas
-                    </button>
 
-            </article>
+                            <span>
 
-        <?php endforeach; ?>
+                                <?= htmlspecialchars(
+                                    $medicine['dosage_form']
+                                    ?? ''
+                                ) ?>
 
-    </div>
+                            </span>
+
+
+                            <span>
+
+                                <?= htmlspecialchars(
+                                    $medicine['strength']
+                                    ?? ''
+                                ) ?>
+
+                            </span>
+
+
+                        </div>
+
+
+                        <div class="medicine-status">
+
+
+                            <?php if ($medicine['prescription_required']): ?>
+
+
+                                <span
+                                    class="
+                                        prescription
+                                        prescription-required
+                                    "
+                                >
+                                    Recepšu zāles
+                                </span>
+
+
+                            <?php else: ?>
+
+
+                                <span
+                                    class="
+                                        prescription
+                                        prescription-free
+                                    "
+                                >
+                                    Bez receptes
+                                </span>
+
+
+                            <?php endif; ?>
+
+
+                            <?php if ($medicine['stock_quantity'] > 0): ?>
+
+
+                                <span class="stock available">
+                                    Pieejams
+                                </span>
+
+
+                            <?php else: ?>
+
+
+                                <span class="stock unavailable">
+                                    Nav pieejams
+                                </span>
+
+
+                            <?php endif; ?>
+
+
+                        </div>
+
+
+                        <div class="medicine-bottom">
+
+
+                            <strong class="medicine-price">
+
+                                <?= number_format(
+                                    (float) $medicine['price'],
+                                    2,
+                                    ',',
+                                    ' '
+                                ) ?>
+
+                                €
+
+                            </strong>
+
+
+                            <small>
+
+                                Noliktavā:
+
+                                <?= (int) $medicine['stock_quantity'] ?>
+
+                            </small>
+
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="medicine-info-button"
+
+                            data-medicine-name="<?= htmlspecialchars(
+                                $medicine['name'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+
+                            data-active-substance="<?= htmlspecialchars(
+                                $medicine['active_substance'] ?? '',
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+
+                            data-api-search-name="<?= htmlspecialchars(
+                                $medicine['api_search_name'] ?? '',
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                        >
+                            Vairāk informācijas
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="medicine-buy-button"
+
+                            data-medicine-id="<?= (int) $medicine['id'] ?>"
+
+                            data-medicine-name="<?= htmlspecialchars(
+                                $medicine['name'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+
+                            data-medicine-price="<?= htmlspecialchars(
+                                (string) $medicine['price'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+
+                            data-medicine-stock="<?= (int) $medicine['stock_quantity'] ?>"
+
+                            data-prescription-required="<?= (int) $medicine['prescription_required'] ?>"
+
+                            <?= $medicine['stock_quantity'] <= 0
+                                ? 'disabled'
+                                : ''
+                            ?>
+                        >
+
+                            <?= $medicine['stock_quantity'] > 0
+                                ? 'Pirkt'
+                                : 'Nav pieejams'
+                            ?>
+
+                        </button>
+
+
+                    </article>
+
+
+                <?php endforeach; ?>
+
+
+            </div>
 
         </div>
 
@@ -425,12 +573,14 @@ $medicines = $stmt->fetchAll();
                 Kontakti
             </span>
 
+
             <h2 class="section-title">
                 Sazinieties ar mums
             </h2>
 
 
             <div class="contact-grid">
+
 
                 <div class="contact-card">
 
@@ -483,13 +633,18 @@ $medicines = $stmt->fetchAll();
 
                 </div>
 
+
             </div>
 
         </div>
 
     </section>
 
+
 </main>
+
+
+<!-- MEDICINE INFO MODAL -->
 
 <div
     id="medicineModal"
@@ -520,14 +675,111 @@ $medicines = $stmt->fetchAll();
 
 </div>
 
+
+<!-- CART MODAL -->
+
+<div
+    id="cartModal"
+    class="cart-modal"
+>
+
+    <div class="cart-modal-content">
+
+
+        <div class="cart-header">
+
+            <div>
+
+                <span class="section-label">
+                    Pirkums
+                </span>
+
+                <h2>
+                    Jūsu grozs
+                </h2>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="cartCloseButton"
+                class="cart-close-button"
+                aria-label="Aizvērt"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="cartMessage"
+            class="cart-message"
+        ></div>
+
+
+        <div id="cartItems">
+
+            <p class="cart-empty">
+                Grozs ir tukšs.
+            </p>
+
+        </div>
+
+
+        <div
+            id="cartPrescriptionWarning"
+            class="cart-prescription-warning"
+        >
+
+            Šajā grozā ir recepšu zāles.
+
+            Pirms apmaksas būs nepieciešams
+            pārbaudīt recepti.
+
+        </div>
+
+
+        <div class="cart-summary">
+
+            <span>
+                Kopā:
+            </span>
+
+            <strong id="cartTotal">
+                0,00 €
+            </strong>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="continueCheckoutButton"
+            class="cart-checkout-button"
+        >
+            Turpināt
+        </button>
+
+
+    </div>
+
+</div>
+
+
 <footer class="footer">
 
     <div class="container footer-content">
 
         <div class="logo">
+
             <span class="logo-icon">+</span>
+
             Aptieka
+
         </div>
+
 
         <p>
             © 2026 Aptieka
@@ -536,8 +788,15 @@ $medicines = $stmt->fetchAll();
     </div>
 
 </footer>
+
+
 <script src="assets/js/theme.js"></script>
+
 <script src="assets/js/medicine-api.js"></script>
+
+<script src="assets/js/cart.js"></script>
+
+
 </body>
 
 </html>
