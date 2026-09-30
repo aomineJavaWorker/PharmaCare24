@@ -28,6 +28,7 @@ $newOrderCount = (int) $pdo
         SELECT COUNT(*)
         FROM orders
         WHERE status = 'Jauns'
+        AND deleted_at IS NULL
     ")
     ->fetchColumn();
 
@@ -49,6 +50,7 @@ $latestOrdersStmt = $pdo->query("
         status,
         created_at
     FROM orders
+    WHERE deleted_at IS NULL
     ORDER BY created_at DESC
     LIMIT 5
 ");
