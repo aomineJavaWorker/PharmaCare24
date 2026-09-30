@@ -46,9 +46,9 @@ if ($method === 'GET') {
     );
 
 
-    /*
-     * VIENS PASŪTĪJUMS
-     */
+    /* =====================================================
+       VIENS PASŪTĪJUMS
+       ===================================================== */
 
     if ($id) {
 
@@ -70,9 +70,12 @@ if ($method === 'GET') {
                     stripe_session_id,
                     created_at,
                     updated_at
+
                  FROM orders
+
                  WHERE id = ?
                  AND deleted_at IS NULL
+
                  LIMIT 1'
             );
 
@@ -147,9 +150,9 @@ if ($method === 'GET') {
     }
 
 
-    /*
-     * VISI PASŪTĪJUMI
-     */
+    /* =====================================================
+       VISI PASŪTĪJUMI
+       ===================================================== */
 
     try {
 
@@ -158,7 +161,10 @@ if ($method === 'GET') {
                 orders.id,
 
                 COALESCE(
-                    NULLIF(orders.delivery_name, ''),
+                    NULLIF(
+                        orders.delivery_name,
+                        ''
+                    ),
                     orders.customer_name
                 ) AS customer_name,
 
@@ -230,7 +236,7 @@ if ($method === 'GET') {
 
 
 /* =========================================================
-   PUT
+   PUT - STATUSA MAIŅA
    ========================================================= */
 
 if ($method === 'PUT') {
@@ -251,10 +257,17 @@ if ($method === 'PUT') {
 
 
     $id =
-        (int) ($data['id'] ?? 0);
+        (int) (
+            $data['id']
+            ?? 0
+        );
+
 
     $status =
-        trim($data['status'] ?? '');
+        trim(
+            $data['status']
+            ?? ''
+        );
 
 
     $allowedStatuses = [
@@ -284,9 +297,58 @@ if ($method === 'PUT') {
 
     try {
 
+        /*
+         * Vispirms atrodam pasūtījumu
+         * un saglabājam veco statusu.
+         */
+
+        $checkStmt = $pdo->prepare(
+            'SELECT
+                id,
+                status,
+                customer_name,
+                delivery_name
+
+             FROM orders
+
+             WHERE id = ?
+             AND deleted_at IS NULL
+
+             LIMIT 1'
+        );
+
+
+        $checkStmt->execute([
+            $id
+        ]);
+
+
+        $order =
+            $checkStmt->fetch();
+
+
+        if (!$order) {
+
+            jsonResponse([
+                'success' => false,
+                'message' => 'Pasūtījums nav atrasts.'
+            ], 404);
+        }
+
+
+        $oldStatus =
+            $order['status'];
+
+
+        /*
+         * Mainām statusu.
+         */
+
         $stmt = $pdo->prepare(
             'UPDATE orders
+
              SET status = ?
+
              WHERE id = ?
              AND deleted_at IS NULL'
         );
@@ -298,30 +360,20 @@ if ($method === 'PUT') {
         ]);
 
 
-        if ($stmt->rowCount() === 0) {
+        /*
+         * AUDIT LOG
+         */
 
-            $checkStmt = $pdo->prepare(
-                'SELECT id
-                 FROM orders
-                 WHERE id = ?
-                 AND deleted_at IS NULL
-                 LIMIT 1'
-            );
-
-
-            $checkStmt->execute([
-                $id
-            ]);
-
-
-            if (!$checkStmt->fetch()) {
-
-                jsonResponse([
-                    'success' => false,
-                    'message' => 'Pasūtījums nav atrasts.'
-                ], 404);
-            }
-        }
+        logAction(
+            $pdo,
+            'UPDATE',
+            'order',
+            $id,
+            'Mainīts pasūtījuma statuss: ' .
+            $oldStatus .
+            ' → ' .
+            $status
+        );
 
 
         jsonResponse([
@@ -362,7 +414,10 @@ if ($method === 'DELETE') {
 
 
     $id =
-        (int) ($data['id'] ?? 0);
+        (int) (
+            $data['id']
+            ?? 0
+        );
 
 
     if ($id <= 0) {
@@ -376,9 +431,54 @@ if ($method === 'DELETE') {
 
     try {
 
+        /*
+         * Pārbaudām vai pasūtījums eksistē.
+         */
+
+        $checkStmt = $pdo->prepare(
+            'SELECT
+                id,
+                customer_name,
+                delivery_name,
+                total,
+                status
+
+             FROM orders
+
+             WHERE id = ?
+             AND deleted_at IS NULL
+
+             LIMIT 1'
+        );
+
+
+        $checkStmt->execute([
+            $id
+        ]);
+
+
+        $order =
+            $checkStmt->fetch();
+
+
+        if (!$order) {
+
+            jsonResponse([
+                'success' => false,
+                'message' => 'Pasūtījums nav atrasts.'
+            ], 404);
+        }
+
+
+        /*
+         * SOFT DELETE
+         */
+
         $stmt = $pdo->prepare(
             'UPDATE orders
+
              SET deleted_at = NOW()
+
              WHERE id = ?
              AND deleted_at IS NULL'
         );
@@ -398,6 +498,38 @@ if ($method === 'DELETE') {
         }
 
 
+        /*
+         * Klienta vārds audit log.
+         */
+
+        $customerName =
+            !empty($order['delivery_name'])
+                ? $order['delivery_name']
+                : (
+                    $order['customer_name']
+                    ?? 'Klients'
+                );
+
+
+        /*
+         * AUDIT LOG
+         */
+
+        logAction(
+            $pdo,
+            'SOFT_DELETE',
+            'order',
+            $id,
+            'Dzēsts pasūtījums #' .
+            $id .
+            ', klients: ' .
+            $customerName .
+            ', summa: ' .
+            $order['total'] .
+            ' EUR'
+        );
+
+
         jsonResponse([
             'success' => true,
             'message' => 'Pasūtījums veiksmīgi dzēsts.'
@@ -413,6 +545,10 @@ if ($method === 'DELETE') {
     }
 }
 
+
+/* =========================================================
+   NEATĻAUTA METODE
+   ========================================================= */
 
 jsonResponse([
     'success' => false,

@@ -1,20 +1,28 @@
 <?php
 
 session_start();
+
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/audit_log.php';
+
 header('Content-Type: application/json; charset=utf-8');
 
 
 function jsonResponse(array $data, int $status = 200): void
 {
     http_response_code($status);
-    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+
+    echo json_encode(
+        $data,
+        JSON_UNESCAPED_UNICODE
+    );
+
     exit;
 }
 
 
 if (!isset($_SESSION['user_id'])) {
+
     jsonResponse([
         'success' => false,
         'message' => 'Nav autorizācijas.'
@@ -31,17 +39,23 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
 
-    $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+    $id = filter_input(
+        INPUT_GET,
+        'id',
+        FILTER_VALIDATE_INT
+    );
 
 
-    /* Vienu zāļu ielāde */
+    /* =========================
+       VIENAS ZĀLES
+       ========================= */
 
     if ($id) {
 
         try {
 
             $stmt = $pdo->prepare(
-                "SELECT
+                'SELECT
                     id,
                     category_id,
                     name,
@@ -53,17 +67,23 @@ if ($method === 'GET') {
                     stock_quantity,
                     prescription_required,
                     api_search_name
-                    WHERE id = ?
-                    AND deleted_at IS NULL
-                    LIMIT 1"
+                 FROM medicines
+                 WHERE id = ?
+                 AND deleted_at IS NULL
+                 LIMIT 1'
             );
 
-            $stmt->execute([$id]);
+
+            $stmt->execute([
+                $id
+            ]);
+
 
             $medicine = $stmt->fetch();
 
 
             if (!$medicine) {
+
                 jsonResponse([
                     'success' => false,
                     'message' => 'Zāles nav atrastas.'
@@ -76,6 +96,7 @@ if ($method === 'GET') {
                 'data' => $medicine
             ]);
 
+
         } catch (PDOException $e) {
 
             jsonResponse([
@@ -86,12 +107,14 @@ if ($method === 'GET') {
     }
 
 
-    /* Visu zāļu ielāde */
+    /* =========================
+       VISAS ZĀLES
+       ========================= */
 
     try {
 
         $stmt = $pdo->query(
-            "SELECT
+            'SELECT
                 medicines.id,
                 medicines.category_id,
                 medicines.name,
@@ -104,11 +127,16 @@ if ($method === 'GET') {
                 medicines.prescription_required,
                 medicines.api_search_name,
                 categories.name AS category_name
+
              FROM medicines
-            LEFT JOIN categories
-                ON medicines.category_id = categories.id
-            WHERE medicines.deleted_at IS NULL
-            ORDER BY medicines.name ASC"
+
+             LEFT JOIN categories
+                ON medicines.category_id =
+                   categories.id
+
+             WHERE medicines.deleted_at IS NULL
+
+             ORDER BY medicines.name ASC'
         );
 
 
@@ -116,9 +144,11 @@ if ($method === 'GET') {
 
 
         $categoryStmt = $pdo->query(
-            "SELECT id, name
+            'SELECT
+                id,
+                name
              FROM categories
-             ORDER BY name ASC"
+             ORDER BY name ASC'
         );
 
 
@@ -131,6 +161,7 @@ if ($method === 'GET') {
             'categories' => $categories
         ]);
 
+
     } catch (PDOException $e) {
 
         jsonResponse([
@@ -142,7 +173,7 @@ if ($method === 'GET') {
 
 
 /* =========================================================
-   POST
+   POST - CREATE
    ========================================================= */
 
 if ($method === 'POST') {
@@ -154,6 +185,7 @@ if ($method === 'POST') {
 
 
     if (!is_array($data)) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgi nosūtītie dati.'
@@ -161,17 +193,37 @@ if ($method === 'POST') {
     }
 
 
-    $categoryId = (int) ($data['category_id'] ?? 0);
-    $name = trim($data['name'] ?? '');
-    $activeSubstance = trim($data['active_substance'] ?? '');
-    $manufacturer = trim($data['manufacturer'] ?? '');
-    $dosageForm = trim($data['dosage_form'] ?? '');
-    $strength = trim($data['strength'] ?? '');
-    $price = (float) ($data['price'] ?? 0);
-    $stockQuantity = (int) ($data['stock_quantity'] ?? 0);
+    $categoryId =
+        (int) ($data['category_id'] ?? 0);
+
+    $name =
+        trim($data['name'] ?? '');
+
+    $activeSubstance =
+        trim($data['active_substance'] ?? '');
+
+    $manufacturer =
+        trim($data['manufacturer'] ?? '');
+
+    $dosageForm =
+        trim($data['dosage_form'] ?? '');
+
+    $strength =
+        trim($data['strength'] ?? '');
+
+    $price =
+        (float) ($data['price'] ?? 0);
+
+    $stockQuantity =
+        (int) ($data['stock_quantity'] ?? 0);
+
     $prescriptionRequired =
-        !empty($data['prescription_required']) ? 1 : 0;
-    $apiSearchName = trim($data['api_search_name'] ?? '');
+        !empty($data['prescription_required'])
+            ? 1
+            : 0;
+
+    $apiSearchName =
+        trim($data['api_search_name'] ?? '');
 
 
     if (
@@ -183,12 +235,15 @@ if ($method === 'POST') {
         $price <= 0 ||
         $stockQuantity < 0
     ) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Aizpildiet visus obligātos laukus.'
         ], 422);
     }
 
+
+    /* KATEGORIJAS PĀRBAUDE */
 
     $categoryStmt = $pdo->prepare(
         'SELECT id
@@ -197,10 +252,14 @@ if ($method === 'POST') {
          LIMIT 1'
     );
 
-    $categoryStmt->execute([$categoryId]);
+
+    $categoryStmt->execute([
+        $categoryId
+    ]);
 
 
     if (!$categoryStmt->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Izvēlētā kategorija nav atrasta.'
@@ -224,6 +283,7 @@ if ($method === 'POST') {
                     prescription_required,
                     api_search_name
                 )
+
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
 
@@ -234,18 +294,40 @@ if ($method === 'POST') {
             $activeSubstance,
             $manufacturer,
             $dosageForm,
-            $strength !== '' ? $strength : null,
+            $strength !== ''
+                ? $strength
+                : null,
             $price,
             $stockQuantity,
             $prescriptionRequired,
-            $apiSearchName !== '' ? $apiSearchName : null
+            $apiSearchName !== ''
+                ? $apiSearchName
+                : null
         ]);
+
+
+        $medicineId =
+            (int) $pdo->lastInsertId();
+
+
+        /* =========================
+           AUDIT LOG - CREATE
+           ========================= */
+
+        logAction(
+            $pdo,
+            'CREATE',
+            'medicine',
+            $medicineId,
+            'Pievienotas zāles: ' . $name
+        );
 
 
         jsonResponse([
             'success' => true,
             'message' => 'Zāles veiksmīgi pievienotas.'
         ], 201);
+
 
     } catch (PDOException $e) {
 
@@ -258,7 +340,7 @@ if ($method === 'POST') {
 
 
 /* =========================================================
-   PUT
+   PUT - UPDATE
    ========================================================= */
 
 if ($method === 'PUT') {
@@ -270,6 +352,7 @@ if ($method === 'PUT') {
 
 
     if (!is_array($data)) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgi nosūtītie dati.'
@@ -277,18 +360,40 @@ if ($method === 'PUT') {
     }
 
 
-    $id = (int) ($data['id'] ?? 0);
-    $categoryId = (int) ($data['category_id'] ?? 0);
-    $name = trim($data['name'] ?? '');
-    $activeSubstance = trim($data['active_substance'] ?? '');
-    $manufacturer = trim($data['manufacturer'] ?? '');
-    $dosageForm = trim($data['dosage_form'] ?? '');
-    $strength = trim($data['strength'] ?? '');
-    $price = (float) ($data['price'] ?? 0);
-    $stockQuantity = (int) ($data['stock_quantity'] ?? 0);
+    $id =
+        (int) ($data['id'] ?? 0);
+
+    $categoryId =
+        (int) ($data['category_id'] ?? 0);
+
+    $name =
+        trim($data['name'] ?? '');
+
+    $activeSubstance =
+        trim($data['active_substance'] ?? '');
+
+    $manufacturer =
+        trim($data['manufacturer'] ?? '');
+
+    $dosageForm =
+        trim($data['dosage_form'] ?? '');
+
+    $strength =
+        trim($data['strength'] ?? '');
+
+    $price =
+        (float) ($data['price'] ?? 0);
+
+    $stockQuantity =
+        (int) ($data['stock_quantity'] ?? 0);
+
     $prescriptionRequired =
-        !empty($data['prescription_required']) ? 1 : 0;
-    $apiSearchName = trim($data['api_search_name'] ?? '');
+        !empty($data['prescription_required'])
+            ? 1
+            : 0;
+
+    $apiSearchName =
+        trim($data['api_search_name'] ?? '');
 
 
     if (
@@ -301,6 +406,7 @@ if ($method === 'PUT') {
         $price <= 0 ||
         $stockQuantity < 0
     ) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Aizpildiet visus obligātos laukus.'
@@ -308,7 +414,7 @@ if ($method === 'PUT') {
     }
 
 
-    /* Pārbaudām, vai zāles eksistē */
+    /* ZĀĻU PĀRBAUDE */
 
     $medicineStmt = $pdo->prepare(
         'SELECT id
@@ -318,10 +424,14 @@ if ($method === 'PUT') {
          LIMIT 1'
     );
 
-    $medicineStmt->execute([$id]);
+
+    $medicineStmt->execute([
+        $id
+    ]);
 
 
     if (!$medicineStmt->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Zāles nav atrastas.'
@@ -329,7 +439,7 @@ if ($method === 'PUT') {
     }
 
 
-    /* Pārbaudām kategoriju */
+    /* KATEGORIJAS PĀRBAUDE */
 
     $categoryStmt = $pdo->prepare(
         'SELECT id
@@ -338,10 +448,14 @@ if ($method === 'PUT') {
          LIMIT 1'
     );
 
-    $categoryStmt->execute([$categoryId]);
+
+    $categoryStmt->execute([
+        $categoryId
+    ]);
 
 
     if (!$categoryStmt->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Izvēlētā kategorija nav atrasta.'
@@ -353,6 +467,7 @@ if ($method === 'PUT') {
 
         $stmt = $pdo->prepare(
             'UPDATE medicines
+
              SET
                 category_id = ?,
                 name = ?,
@@ -364,7 +479,9 @@ if ($method === 'PUT') {
                 stock_quantity = ?,
                 prescription_required = ?,
                 api_search_name = ?
-             WHERE id = ?'
+
+             WHERE id = ?
+             AND deleted_at IS NULL'
         );
 
 
@@ -374,19 +491,37 @@ if ($method === 'PUT') {
             $activeSubstance,
             $manufacturer,
             $dosageForm,
-            $strength !== '' ? $strength : null,
+            $strength !== ''
+                ? $strength
+                : null,
             $price,
             $stockQuantity,
             $prescriptionRequired,
-            $apiSearchName !== '' ? $apiSearchName : null,
+            $apiSearchName !== ''
+                ? $apiSearchName
+                : null,
             $id
         ]);
+
+
+        /* =========================
+           AUDIT LOG - UPDATE
+           ========================= */
+
+        logAction(
+            $pdo,
+            'UPDATE',
+            'medicine',
+            $id,
+            'Rediģētas zāles: ' . $name
+        );
 
 
         jsonResponse([
             'success' => true,
             'message' => 'Zāles veiksmīgi rediģētas.'
         ]);
+
 
     } catch (PDOException $e) {
 
@@ -409,44 +544,73 @@ if ($method === 'DELETE') {
         true
     );
 
+
     if (!is_array($data)) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgi nosūtītie dati.'
         ], 400);
     }
 
-    $id = (int) ($data['id'] ?? 0);
+
+    $id =
+        (int) ($data['id'] ?? 0);
+
 
     if ($id <= 0) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgs zāļu ID.'
         ], 422);
     }
 
+
     try {
 
         $stmt = $pdo->prepare(
             'UPDATE medicines
+
              SET deleted_at = NOW()
+
              WHERE id = ?
              AND deleted_at IS NULL'
         );
 
-        $stmt->execute([$id]);
+
+        $stmt->execute([
+            $id
+        ]);
+
 
         if ($stmt->rowCount() === 0) {
+
             jsonResponse([
                 'success' => false,
                 'message' => 'Zāles nav atrastas.'
             ], 404);
         }
 
+
+        /* =========================
+           AUDIT LOG - SOFT DELETE
+           ========================= */
+
+        logAction(
+            $pdo,
+            'SOFT_DELETE',
+            'medicine',
+            $id,
+            'Zāles dzēstas'
+        );
+
+
         jsonResponse([
             'success' => true,
             'message' => 'Zāles veiksmīgi dzēstas.'
         ]);
+
 
     } catch (PDOException $e) {
 
@@ -456,6 +620,11 @@ if ($method === 'DELETE') {
         ], 500);
     }
 }
+
+
+/* =========================================================
+   NEATĻAUTA METODE
+   ========================================================= */
 
 jsonResponse([
     'success' => false,
