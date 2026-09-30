@@ -767,6 +767,133 @@ $medicines = $stmt->fetchAll();
 
 </div>
 
+<!-- PRESCRIPTION CHECK MODAL -->
+
+<div
+    id="prescriptionModal"
+    class="cart-modal"
+>
+
+    <div class="cart-modal-content prescription-modal-content">
+
+        <div class="cart-header">
+
+            <div>
+
+                <span class="section-label">
+                    Receptes pārbaude
+                </span>
+
+                <h2>
+                    Pircēja dati
+                </h2>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="prescriptionCloseButton"
+                class="cart-close-button"
+                aria-label="Aizvērt"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <p class="prescription-description">
+
+            Grozā ir recepšu zāles.
+            Lai turpinātu pirkumu,
+            pārbaudiet recepti.
+
+        </p>
+
+
+        <div
+            id="prescriptionCheckMessage"
+            class="cart-message"
+        ></div>
+
+
+        <form id="prescriptionCheckForm">
+
+
+            <div class="prescription-form-group">
+
+                <label for="prescriptionPatientName">
+                    Vārds un uzvārds *
+                </label>
+
+                <input
+                    type="text"
+                    id="prescriptionPatientName"
+                    name="patient_name"
+                    autocomplete="name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="prescription-form-group">
+
+                <label for="prescriptionPersonalCode">
+                    Personas kods *
+                </label>
+
+                <input
+                    type="text"
+                    id="prescriptionPersonalCode"
+                    name="personal_code"
+                    placeholder="999999-00001"
+                    maxlength="12"
+                    pattern="[0-9]{6}-[0-9]{5}"
+                    required
+                >
+
+            </div>
+
+
+            <div class="prescription-actions">
+
+                <button
+                    type="button"
+                    id="backToCartButton"
+                    class="prescription-back-button"
+                >
+                    Atpakaļ
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="cart-checkout-button prescription-check-button"
+                >
+                    Pārbaudīt recepti
+                </button>
+
+            </div>
+
+
+        </form>
+
+
+        <button
+            type="button"
+            id="prescriptionContinueButton"
+            class="cart-checkout-button"
+            disabled
+        >
+            Turpināt uz apmaksu
+        </button>
+
+
+    </div>
+
+</div>
 
 <footer class="footer">
 

@@ -29,6 +29,48 @@ const continueCheckoutButton =
         'continueCheckoutButton'
     );
 
+
+const prescriptionModal =
+    document.getElementById(
+        'prescriptionModal'
+    );
+
+const prescriptionCloseButton =
+    document.getElementById(
+        'prescriptionCloseButton'
+    );
+
+const prescriptionCheckForm =
+    document.getElementById(
+        'prescriptionCheckForm'
+    );
+
+const prescriptionPatientName =
+    document.getElementById(
+        'prescriptionPatientName'
+    );
+
+const prescriptionPersonalCode =
+    document.getElementById(
+        'prescriptionPersonalCode'
+    );
+
+const prescriptionCheckMessage =
+    document.getElementById(
+        'prescriptionCheckMessage'
+    );
+
+const prescriptionContinueButton =
+    document.getElementById(
+        'prescriptionContinueButton'
+    );
+
+const backToCartButton =
+    document.getElementById(
+        'backToCartButton'
+    );
+
+
 const buyButtons =
     document.querySelectorAll(
         '.medicine-buy-button'
@@ -36,6 +78,8 @@ const buyButtons =
 
 
 let cart = loadCart();
+
+let verifiedPrescriptionData = null;
 
 
 renderCart();
@@ -52,6 +96,7 @@ buyButtons.forEach(function (button) {
         function () {
 
             const medicine = {
+
                 id: Number(
                     button.dataset.medicineId
                 ),
@@ -118,9 +163,12 @@ function addToCart(medicine) {
     }
 
 
+    invalidatePrescriptionCheck();
+
     saveCart();
 
     renderCart();
+
 
     showCartMessage(
         `"${medicine.name}" pievienots grozam.`,
@@ -181,16 +229,15 @@ function renderCart() {
     cart.forEach(function (item) {
 
         total +=
-            item.price * item.quantity;
+            item.price *
+            item.quantity;
 
 
         totalQuantity +=
             item.quantity;
 
 
-        if (
-            item.prescriptionRequired
-        ) {
+        if (item.prescriptionRequired) {
 
             containsPrescriptionMedicine =
                 true;
@@ -242,9 +289,11 @@ function renderCart() {
 
 
                 <small>
+
                     ${formatPrice(
                         item.price
                     )} / gab.
+
                 </small>
 
             </div>
@@ -282,10 +331,12 @@ function renderCart() {
             <div class="cart-item-price">
 
                 <strong>
+
                     ${formatPrice(
                         item.price *
                         item.quantity
                     )}
+
                 </strong>
 
 
@@ -299,7 +350,6 @@ function renderCart() {
                 </button>
 
             </div>
-
         `;
 
 
@@ -355,6 +405,7 @@ function addCartItemEvents() {
                             button.dataset.id
                         );
 
+
                     const action =
                         button.dataset.action;
 
@@ -384,7 +435,6 @@ function addCartItemEvents() {
 
                         removeFromCart(id);
                     }
-
                 }
             );
         }
@@ -422,6 +472,8 @@ function increaseQuantity(id) {
     item.quantity++;
 
 
+    invalidatePrescriptionCheck();
+
     saveCart();
 
     renderCart();
@@ -452,6 +504,8 @@ function decreaseQuantity(id) {
     item.quantity--;
 
 
+    invalidatePrescriptionCheck();
+
     saveCart();
 
     renderCart();
@@ -462,9 +516,12 @@ function removeFromCart(id) {
 
     cart =
         cart.filter(
-            item => item.id !== id
+            item =>
+                item.id !== id
         );
 
+
+    invalidatePrescriptionCheck();
 
     saveCart();
 
@@ -473,7 +530,7 @@ function removeFromCart(id) {
 
 
 /* =========================
-   MODAL
+   CART MODAL
    ========================= */
 
 function openCart() {
@@ -527,26 +584,8 @@ cartModal.addEventListener(
 );
 
 
-document.addEventListener(
-    'keydown',
-    function (event) {
-
-        if (
-            event.key ===
-                'Escape' &&
-            cartModal.classList.contains(
-                'active'
-            )
-        ) {
-
-            closeCart();
-        }
-    }
-);
-
-
 /* =========================
-   TURPINĀT
+   TURPINĀT NO GROZA
    ========================= */
 
 continueCheckoutButton.addEventListener(
@@ -561,28 +600,320 @@ continueCheckoutButton.addEventListener(
         const hasPrescriptionMedicine =
             cart.some(
                 item =>
-                    item
-                        .prescriptionRequired
+                    item.prescriptionRequired
             );
 
 
         if (hasPrescriptionMedicine) {
 
-            showCartMessage(
-                'Nākamajā etapā šeit pievienosim receptes pārbaudi.',
-                'info'
+            openPrescriptionCheck();
+
+            return;
+        }
+
+
+        continueToPayment();
+    }
+);
+
+
+/* =========================
+   RECEPTES MODAL
+   ========================= */
+
+function openPrescriptionCheck() {
+
+    closeCart();
+
+
+    prescriptionModal.classList.add(
+        'active'
+    );
+
+
+    document.body.style.overflow =
+        'hidden';
+
+
+    resetPrescriptionCheck();
+}
+
+
+function closePrescriptionCheck() {
+
+    prescriptionModal.classList.remove(
+        'active'
+    );
+
+
+    document.body.style.overflow =
+        '';
+}
+
+
+prescriptionCloseButton.addEventListener(
+    'click',
+    closePrescriptionCheck
+);
+
+
+prescriptionModal.addEventListener(
+    'click',
+    function (event) {
+
+        if (
+            event.target ===
+            prescriptionModal
+        ) {
+
+            closePrescriptionCheck();
+        }
+    }
+);
+
+
+backToCartButton.addEventListener(
+    'click',
+    function () {
+
+        closePrescriptionCheck();
+
+        openCart();
+    }
+);
+
+
+/* =========================
+   RECEPTES PĀRBAUDE
+   ========================= */
+
+prescriptionCheckForm.addEventListener(
+    'submit',
+    async function (event) {
+
+        event.preventDefault();
+
+
+        prescriptionContinueButton.disabled =
+            true;
+
+
+        verifiedPrescriptionData =
+            null;
+
+
+        showPrescriptionMessage(
+            'Pārbauda recepti...',
+            'info'
+        );
+
+
+        const items =
+            cart.map(
+                function (item) {
+
+                    return {
+                        medicine_id:
+                            item.id,
+
+                        quantity:
+                            item.quantity
+                    };
+                }
+            );
+
+
+        const requestData = {
+
+            patient_name:
+                prescriptionPatientName
+                    .value
+                    .trim(),
+
+            personal_code:
+                prescriptionPersonalCode
+                    .value
+                    .trim(),
+
+            items:
+                items
+        };
+
+
+        try {
+
+            const response =
+                await fetch(
+                    'api/check-prescription.php',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body:
+                            JSON.stringify(
+                                requestData
+                            )
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !result.success
+            ) {
+
+                showPrescriptionMessage(
+                    result.message
+                    ?? 'Recepte nav atrasta.',
+                    'error'
+                );
+
+                return;
+            }
+
+
+            verifiedPrescriptionData = {
+
+                patientName:
+                    requestData.patient_name,
+
+                personalCode:
+                    requestData.personal_code,
+
+                prescriptions:
+                    result.prescriptions
+                    ?? []
+            };
+
+
+            showPrescriptionMessage(
+                'Recepte ir derīga. Varat turpināt uz apmaksu.',
+                'success'
+            );
+
+
+            prescriptionContinueButton.disabled =
+                false;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            showPrescriptionMessage(
+                'Neizdevās sazināties ar serveri.',
+                'error'
+            );
+        }
+    }
+);
+
+
+/* =========================
+   PĒC RECEPTES PĀRBAUDES
+   ========================= */
+
+prescriptionContinueButton.addEventListener(
+    'click',
+    function () {
+
+        if (!verifiedPrescriptionData) {
+
+            showPrescriptionMessage(
+                'Vispirms pārbaudiet recepti.',
+                'error'
             );
 
             return;
         }
 
 
-        showCartMessage(
-            'Grozs ir gatavs apmaksai. Stripe pievienosim nākamajos etapos.',
-            'info'
-        );
+        continueToPayment();
     }
 );
+
+
+/* =========================
+   PAYMENT PLACEHOLDER
+   ========================= */
+
+function continueToPayment() {
+
+    const hasPrescriptionMedicine =
+        cart.some(
+            item =>
+                item.prescriptionRequired
+        );
+
+
+    if (hasPrescriptionMedicine) {
+
+        showPrescriptionMessage(
+            'Recepte ir pārbaudīta. Nākamajā etapā šeit pieslēgsim Stripe apmaksu.',
+            'success'
+        );
+
+        return;
+    }
+
+
+    showCartMessage(
+        'Recepte nav nepieciešama. Grozs ir gatavs apmaksai.',
+        'success'
+    );
+}
+
+
+/* =========================
+   INVALIDATE CHECK
+   ========================= */
+
+function invalidatePrescriptionCheck() {
+
+    verifiedPrescriptionData =
+        null;
+
+
+    if (
+        prescriptionContinueButton
+    ) {
+
+        prescriptionContinueButton.disabled =
+            true;
+    }
+}
+
+
+function resetPrescriptionCheck() {
+
+    verifiedPrescriptionData =
+        null;
+
+
+    prescriptionContinueButton.disabled =
+        true;
+
+
+    prescriptionCheckMessage.textContent =
+        '';
+
+
+    prescriptionCheckMessage.className =
+        'cart-message';
+
+
+    prescriptionCheckMessage.style.display =
+        'none';
+}
 
 
 /* =========================
@@ -635,7 +966,7 @@ function loadCart() {
 
 
 /* =========================
-   PAZIŅOJUMI
+   CART MESSAGE
    ========================= */
 
 function showCartMessage(
@@ -671,6 +1002,65 @@ function showCartMessage(
             3000
         );
 }
+
+
+/* =========================
+   PRESCRIPTION MESSAGE
+   ========================= */
+
+function showPrescriptionMessage(
+    message,
+    type
+) {
+
+    prescriptionCheckMessage.textContent =
+        message;
+
+
+    prescriptionCheckMessage.className =
+        `cart-message ${type}`;
+
+
+    prescriptionCheckMessage.style.display =
+        'block';
+}
+
+
+/* =========================
+   ESCAPE
+   ========================= */
+
+document.addEventListener(
+    'keydown',
+    function (event) {
+
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+
+        if (
+            prescriptionModal.classList.contains(
+                'active'
+            )
+        ) {
+
+            closePrescriptionCheck();
+
+            return;
+        }
+
+
+        if (
+            cartModal.classList.contains(
+                'active'
+            )
+        ) {
+
+            closeCart();
+        }
+    }
+);
 
 
 /* =========================
