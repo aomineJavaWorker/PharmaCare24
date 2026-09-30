@@ -15,10 +15,11 @@ $stmt = $pdo->query(
         medicines.stock_quantity,
         medicines.prescription_required,
         categories.name AS category_name
-    FROM medicines
-    LEFT JOIN categories
-        ON medicines.category_id = categories.id
-    ORDER BY medicines.name ASC'
+        FROM medicines
+        LEFT JOIN categories
+            ON medicines.category_id = categories.id
+        WHERE medicines.deleted_at IS NULL
+        ORDER BY medicines.name ASC'
 );
 
 $medicines = $stmt->fetchAll();

@@ -5,7 +5,11 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
 
 $medicineCount = (int) $pdo
-    ->query('SELECT COUNT(*) FROM medicines')
+    ->query(
+        'SELECT COUNT(*)
+         FROM medicines
+         WHERE deleted_at IS NULL'
+    )
     ->fetchColumn();
 
 
@@ -33,8 +37,8 @@ $lowStockCount = (int) $pdo
         SELECT COUNT(*)
         FROM medicines
         WHERE stock_quantity <= 10
-    ")
-    ->fetchColumn();
+        AND deleted_at IS NULL")
+            ->fetchColumn();
 
 
 $latestOrdersStmt = $pdo->query("

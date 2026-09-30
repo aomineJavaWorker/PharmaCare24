@@ -125,8 +125,9 @@ if ($method === 'GET') {
 
         $medicineStmt = $pdo->query(
             "SELECT id, name, strength
-             FROM medicines
-             ORDER BY name ASC"
+            FROM medicines
+            WHERE deleted_at IS NULL
+            ORDER BY name ASC"
         );
 
         $medicines = $medicineStmt->fetchAll();
@@ -224,8 +225,12 @@ if ($method === 'POST') {
 
 
     $checkMedicine = $pdo->prepare(
-        'SELECT id FROM medicines WHERE id = ? LIMIT 1'
-    );
+        'SELECT id
+        FROM medicines
+        WHERE id = ?
+        AND deleted_at IS NULL
+        LIMIT 1'
+);
 
     $checkMedicine->execute([$medicineId]);
 
@@ -394,7 +399,11 @@ if ($method === 'PUT') {
 
 
     $checkMedicine = $pdo->prepare(
-        'SELECT id FROM medicines WHERE id = ? LIMIT 1'
+        'SELECT id
+        FROM medicines
+        WHERE id = ?
+        AND deleted_at IS NULL
+        LIMIT 1'
     );
 
     $checkMedicine->execute([$medicineId]);

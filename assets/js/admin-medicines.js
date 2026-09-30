@@ -232,7 +232,6 @@ function renderMedicines(medicines) {
 
                 <td>
                     <div class="table-actions">
-
                         <button
                             type="button"
                             class="
@@ -241,6 +240,17 @@ function renderMedicines(medicines) {
                             "
                         >
                             Rediģēt
+                        </button>
+
+                        <button
+                            type="button"
+                            class="
+                                table-action-button
+                                delete-action-button
+                                delete-medicine-button
+                            "
+                        >
+                            Dzēst
                         </button>
 
                     </div>
@@ -265,6 +275,23 @@ function renderMedicines(medicines) {
 
                     openEditMedicine(
                         medicine.id
+                    );
+                }
+            );
+
+            const deleteButton =
+                row.querySelector(
+                    '.delete-medicine-button'
+                );
+
+
+            deleteButton.addEventListener(
+                'click',
+                function () {
+
+                    deleteMedicine(
+                        medicine.id,
+                        medicine.name
                     );
                 }
             );
@@ -682,6 +709,77 @@ function showFormMessage(
         `form-message ${type}`;
 }
 
+/* =========================
+   ZĀĻU DZĒŠANA
+   ========================= */
+
+async function deleteMedicine(id, name) {
+
+    const confirmed =
+        confirm(
+            `Vai tiešām vēlaties dzēst zāles "${name}"?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            '../api/medicines.php',
+            {
+                method: 'DELETE',
+
+                headers: {
+                    'Content-Type':
+                        'application/json'
+                },
+
+                body: JSON.stringify({id: id})
+            }
+        );
+
+
+        if (response.status === 401) {
+
+            window.location.href =
+                'login.php';
+
+            return;
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            alert(
+                result.message
+                ?? 'Neizdevās dzēst zāles.'
+            );
+
+            return;
+        }
+        await loadMedicines();
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            'Neizdevās sazināties ar serveri.'
+        );
+    }
+}
 
 function clearFormMessage() {
 

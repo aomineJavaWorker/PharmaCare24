@@ -53,9 +53,9 @@ if ($method === 'GET') {
                     stock_quantity,
                     prescription_required,
                     api_search_name
-                 FROM medicines
-                 WHERE id = ?
-                 LIMIT 1"
+                    WHERE id = ?
+                    AND deleted_at IS NULL
+                    LIMIT 1"
             );
 
             $stmt->execute([$id]);
@@ -105,9 +105,10 @@ if ($method === 'GET') {
                 medicines.api_search_name,
                 categories.name AS category_name
              FROM medicines
-             LEFT JOIN categories
+            LEFT JOIN categories
                 ON medicines.category_id = categories.id
-             ORDER BY medicines.name ASC"
+            WHERE medicines.deleted_at IS NULL
+            ORDER BY medicines.name ASC"
         );
 
 
@@ -313,6 +314,7 @@ if ($method === 'PUT') {
         'SELECT id
          FROM medicines
          WHERE id = ?
+         AND deleted_at IS NULL
          LIMIT 1'
     );
 
@@ -395,6 +397,65 @@ if ($method === 'PUT') {
     }
 }
 
+
+/* =========================================================
+   DELETE - SOFT DELETE
+   ========================================================= */
+
+if ($method === 'DELETE') {
+
+    $data = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
+
+    if (!is_array($data)) {
+        jsonResponse([
+            'success' => false,
+            'message' => 'Nederīgi nosūtītie dati.'
+        ], 400);
+    }
+
+    $id = (int) ($data['id'] ?? 0);
+
+    if ($id <= 0) {
+        jsonResponse([
+            'success' => false,
+            'message' => 'Nederīgs zāļu ID.'
+        ], 422);
+    }
+
+    try {
+
+        $stmt = $pdo->prepare(
+            'UPDATE medicines
+             SET deleted_at = NOW()
+             WHERE id = ?
+             AND deleted_at IS NULL'
+        );
+
+        $stmt->execute([$id]);
+
+        if ($stmt->rowCount() === 0) {
+            jsonResponse([
+                'success' => false,
+                'message' => 'Zāles nav atrastas.'
+            ], 404);
+        }
+
+        jsonResponse([
+            'success' => true,
+            'message' => 'Zāles veiksmīgi dzēstas.'
+        ]);
+
+    } catch (PDOException $e) {
+
+        jsonResponse([
+            'success' => false,
+            'message' => 'Neizdevās dzēst zāles.'
+        ], 500);
+    }
+}
 
 jsonResponse([
     'success' => false,
