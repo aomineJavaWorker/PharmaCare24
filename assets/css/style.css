@@ -1515,6 +1515,82 @@ body {
     margin-top: 14px;
 }
 
+/* =========================
+   PAYMENT RESULT
+   ========================= */
+
+.payment-result-page {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    background-color: var(--background);
+}
+
+
+.payment-result-card {
+    width: min(520px, 100%);
+
+    padding: 45px 35px;
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    background-color: var(--surface);
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+.payment-result-card h1 {
+    margin-bottom: 15px;
+
+    color: var(--heading);
+}
+
+
+.payment-result-card p {
+    margin-bottom: 20px;
+
+    color: var(--muted);
+
+    line-height: 1.6;
+}
+
+
+.payment-result-icon {
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 25px;
+
+    border-radius: 50%;
+
+    background-color: #e7f6ec;
+    color: #177343;
+
+    font-size: 34px;
+    font-weight: bold;
+}
+
+
+.payment-result-icon.error {
+    background-color: #fde9e9;
+    color: #a42e2e;
+}
+
 
 @media (max-width: 520px) {
 

@@ -846,7 +846,12 @@ prescriptionContinueButton.addEventListener(
    PAYMENT PLACEHOLDER
    ========================= */
 
-function continueToPayment() {
+async function continueToPayment() {
+
+    if (cart.length === 0) {
+        return;
+    }
+
 
     const hasPrescriptionMedicine =
         cart.some(
@@ -855,21 +860,178 @@ function continueToPayment() {
         );
 
 
-    if (hasPrescriptionMedicine) {
+    if (
+        hasPrescriptionMedicine &&
+        !verifiedPrescriptionData
+    ) {
 
         showPrescriptionMessage(
-            'Recepte ir pārbaudīta. Nākamajā etapā šeit pieslēgsim Stripe apmaksu.',
-            'success'
+            'Vispirms pārbaudiet recepti.',
+            'error'
         );
 
         return;
     }
 
 
-    showCartMessage(
-        'Recepte nav nepieciešama. Grozs ir gatavs apmaksai.',
-        'success'
-    );
+    const requestData = {
+
+        items:
+            cart.map(
+                function (item) {
+
+                    return {
+                        medicine_id:
+                            item.id,
+
+                        quantity:
+                            item.quantity
+                    };
+                }
+            )
+    };
+
+
+    /*
+     * Personas datus sūtām tikai tad,
+     * ja grozā ir recepšu zāles.
+     */
+
+    if (hasPrescriptionMedicine) {
+
+        requestData.patient_name =
+            verifiedPrescriptionData
+                .patientName;
+
+
+        requestData.personal_code =
+            verifiedPrescriptionData
+                .personalCode;
+    }
+
+
+    continueCheckoutButton.disabled =
+        true;
+
+
+    prescriptionContinueButton.disabled =
+        true;
+
+
+    try {
+
+        const response =
+            await fetch(
+                'api/create-checkout-session.php',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:
+                        JSON.stringify(
+                            requestData
+                        )
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            if (hasPrescriptionMedicine) {
+
+                showPrescriptionMessage(
+                    result.message
+                    ?? 'Neizdevās sākt apmaksu.',
+                    'error'
+                );
+
+            } else {
+
+                showCartMessage(
+                    result.message
+                    ?? 'Neizdevās sākt apmaksu.',
+                    'error'
+                );
+            }
+
+
+            continueCheckoutButton.disabled =
+                false;
+
+
+            if (
+                hasPrescriptionMedicine
+            ) {
+
+                prescriptionContinueButton.disabled =
+                    false;
+            }
+
+
+            return;
+        }
+
+
+        if (!result.url) {
+
+            throw new Error(
+                'Stripe URL nav saņemts.'
+            );
+        }
+
+
+        /*
+         * Pārejam uz Stripe Checkout.
+         */
+
+        window.location.href =
+            result.url;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        if (hasPrescriptionMedicine) {
+
+            showPrescriptionMessage(
+                'Neizdevās sazināties ar maksājumu serveri.',
+                'error'
+            );
+
+        } else {
+
+            showCartMessage(
+                'Neizdevās sazināties ar maksājumu serveri.',
+                'error'
+            );
+        }
+
+
+        continueCheckoutButton.disabled =
+            false;
+
+
+        if (
+            hasPrescriptionMedicine
+        ) {
+
+            prescriptionContinueButton.disabled =
+                false;
+        }
+    }
 }
 
 
