@@ -68,6 +68,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
                 <tr>
                     <th>Nr.</th>
                     <th>Pacients</th>
+                    <th>Personas kods</th>
                     <th>Ārsts</th>
                     <th>Zāles</th>
                     <th>Izrakstīta</th>
@@ -206,6 +207,22 @@ require_once __DIR__ . '/../includes/admin_header.php';
                         type="text"
                         id="patientName"
                         name="patient_name"
+                        required
+                    >
+
+                </div>
+                <div class="form-group">
+                    <label for="personalCode">
+                        Personas kods *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="personalCode"
+                        name="personal_code"
+                        placeholder="999999-00001"
+                        maxlength="12"
+                        pattern="[0-9]{6}-[0-9]{5}"
                         required
                     >
 

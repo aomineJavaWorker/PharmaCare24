@@ -46,6 +46,7 @@ if ($method === 'GET') {
                     prescriptions.id,
                     prescriptions.prescription_number,
                     prescriptions.patient_name,
+                    prescriptions.personal_code,
                     prescriptions.doctor_name,
                     prescriptions.issued_at,
                     prescriptions.valid_until,
@@ -60,8 +61,11 @@ if ($method === 'GET') {
                  LIMIT 1"
             );
 
+
             $stmt->execute([$id]);
+
             $prescription = $stmt->fetch();
+
 
             if (!$prescription) {
                 jsonResponse([
@@ -70,10 +74,12 @@ if ($method === 'GET') {
                 ], 404);
             }
 
+
             jsonResponse([
                 'success' => true,
                 'data' => $prescription
             ]);
+
 
         } catch (PDOException $e) {
 
@@ -94,6 +100,7 @@ if ($method === 'GET') {
                 prescriptions.id,
                 prescriptions.prescription_number,
                 prescriptions.patient_name,
+                prescriptions.personal_code,
                 prescriptions.doctor_name,
                 prescriptions.issued_at,
                 prescriptions.valid_until,
@@ -113,6 +120,7 @@ if ($method === 'GET') {
                 prescriptions.id,
                 prescriptions.prescription_number,
                 prescriptions.patient_name,
+                prescriptions.personal_code,
                 prescriptions.doctor_name,
                 prescriptions.issued_at,
                 prescriptions.valid_until,
@@ -120,15 +128,17 @@ if ($method === 'GET') {
              ORDER BY prescriptions.created_at DESC"
         );
 
+
         $prescriptions = $stmt->fetchAll();
 
 
         $medicineStmt = $pdo->query(
             "SELECT id, name, strength
-            FROM medicines
-            WHERE deleted_at IS NULL
-            ORDER BY name ASC"
+             FROM medicines
+             WHERE deleted_at IS NULL
+             ORDER BY name ASC"
         );
+
 
         $medicines = $medicineStmt->fetchAll();
 
@@ -138,6 +148,7 @@ if ($method === 'GET') {
             'data' => $prescriptions,
             'medicines' => $medicines
         ]);
+
 
     } catch (PDOException $e) {
 
@@ -155,7 +166,11 @@ if ($method === 'GET') {
 
 if ($method === 'POST') {
 
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
+
 
     if (!is_array($data)) {
         jsonResponse([
@@ -167,6 +182,7 @@ if ($method === 'POST') {
 
     $prescriptionNumber = trim($data['prescription_number'] ?? '');
     $patientName = trim($data['patient_name'] ?? '');
+    $personalCode = trim($data['personal_code'] ?? '');
     $doctorName = trim($data['doctor_name'] ?? '');
     $issuedAt = trim($data['issued_at'] ?? '');
     $validUntil = trim($data['valid_until'] ?? '');
@@ -178,6 +194,7 @@ if ($method === 'POST') {
     if (
         $prescriptionNumber === '' ||
         $patientName === '' ||
+        $personalCode === '' ||
         $doctorName === '' ||
         $issuedAt === '' ||
         $validUntil === '' ||
@@ -185,6 +202,7 @@ if ($method === 'POST') {
         $medicineId <= 0 ||
         $quantity <= 0
     ) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Aizpildiet visus obligātos laukus.'
@@ -192,7 +210,17 @@ if ($method === 'POST') {
     }
 
 
+    if (!preg_match('/^\d{6}-\d{5}$/', $personalCode)) {
+
+        jsonResponse([
+            'success' => false,
+            'message' => 'Personas kodam jābūt formātā 999999-00001.'
+        ], 422);
+    }
+
+
     if ($validUntil < $issuedAt) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Derīguma termiņš nevar būt agrāks par izrakstīšanas datumu.'
@@ -200,9 +228,16 @@ if ($method === 'POST') {
     }
 
 
-    $allowedStatuses = ['Aktīva', 'Izmantota', 'Atcelta', 'Beidzies termiņš'];
+    $allowedStatuses = [
+        'Aktīva',
+        'Izmantota',
+        'Atcelta',
+        'Beidzies termiņš'
+    ];
+
 
     if (!in_array($status, $allowedStatuses, true)) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgs receptes statuss.'
@@ -211,12 +246,20 @@ if ($method === 'POST') {
 
 
     $checkPrescription = $pdo->prepare(
-        'SELECT id FROM prescriptions WHERE prescription_number = ? LIMIT 1'
+        'SELECT id
+         FROM prescriptions
+         WHERE prescription_number = ?
+         LIMIT 1'
     );
 
-    $checkPrescription->execute([$prescriptionNumber]);
+
+    $checkPrescription->execute([
+        $prescriptionNumber
+    ]);
+
 
     if ($checkPrescription->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Recepte ar šādu numuru jau eksistē.'
@@ -226,15 +269,20 @@ if ($method === 'POST') {
 
     $checkMedicine = $pdo->prepare(
         'SELECT id
-        FROM medicines
-        WHERE id = ?
-        AND deleted_at IS NULL
-        LIMIT 1'
-);
+         FROM medicines
+         WHERE id = ?
+         AND deleted_at IS NULL
+         LIMIT 1'
+    );
 
-    $checkMedicine->execute([$medicineId]);
+
+    $checkMedicine->execute([
+        $medicineId
+    ]);
+
 
     if (!$checkMedicine->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Izvēlētās zāles nav atrastas.'
@@ -249,13 +297,23 @@ if ($method === 'POST') {
 
         $stmt = $pdo->prepare(
             'INSERT INTO prescriptions
-                (prescription_number, patient_name, doctor_name, issued_at, valid_until, status)
-             VALUES (?, ?, ?, ?, ?, ?)'
+                (
+                    prescription_number,
+                    patient_name,
+                    personal_code,
+                    doctor_name,
+                    issued_at,
+                    valid_until,
+                    status
+                )
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
         );
+
 
         $stmt->execute([
             $prescriptionNumber,
             $patientName,
+            $personalCode,
             $doctorName,
             $issuedAt,
             $validUntil,
@@ -263,14 +321,20 @@ if ($method === 'POST') {
         ]);
 
 
-        $prescriptionId = (int) $pdo->lastInsertId();
+        $prescriptionId =
+            (int) $pdo->lastInsertId();
 
 
         $itemStmt = $pdo->prepare(
             'INSERT INTO prescription_items
-                (prescription_id, medicine_id, quantity)
+                (
+                    prescription_id,
+                    medicine_id,
+                    quantity
+                )
              VALUES (?, ?, ?)'
         );
+
 
         $itemStmt->execute([
             $prescriptionId,
@@ -287,11 +351,13 @@ if ($method === 'POST') {
             'message' => 'Recepte veiksmīgi pievienota.'
         ], 201);
 
+
     } catch (PDOException $e) {
 
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
+
 
         jsonResponse([
             'success' => false,
@@ -307,9 +373,14 @@ if ($method === 'POST') {
 
 if ($method === 'PUT') {
 
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
+
 
     if (!is_array($data)) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgi nosūtītie dati.'
@@ -320,6 +391,7 @@ if ($method === 'PUT') {
     $id = (int) ($data['id'] ?? 0);
     $prescriptionNumber = trim($data['prescription_number'] ?? '');
     $patientName = trim($data['patient_name'] ?? '');
+    $personalCode = trim($data['personal_code'] ?? '');
     $doctorName = trim($data['doctor_name'] ?? '');
     $issuedAt = trim($data['issued_at'] ?? '');
     $validUntil = trim($data['valid_until'] ?? '');
@@ -332,6 +404,7 @@ if ($method === 'PUT') {
         $id <= 0 ||
         $prescriptionNumber === '' ||
         $patientName === '' ||
+        $personalCode === '' ||
         $doctorName === '' ||
         $issuedAt === '' ||
         $validUntil === '' ||
@@ -339,6 +412,7 @@ if ($method === 'PUT') {
         $medicineId <= 0 ||
         $quantity <= 0
     ) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Aizpildiet visus obligātos laukus.'
@@ -346,7 +420,17 @@ if ($method === 'PUT') {
     }
 
 
+    if (!preg_match('/^\d{6}-\d{5}$/', $personalCode)) {
+
+        jsonResponse([
+            'success' => false,
+            'message' => 'Personas kodam jābūt formātā 999999-00001.'
+        ], 422);
+    }
+
+
     if ($validUntil < $issuedAt) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Derīguma termiņš nevar būt agrāks par izrakstīšanas datumu.'
@@ -354,9 +438,16 @@ if ($method === 'PUT') {
     }
 
 
-    $allowedStatuses = ['Aktīva', 'Izmantota', 'Atcelta', 'Beidzies termiņš'];
+    $allowedStatuses = [
+        'Aktīva',
+        'Izmantota',
+        'Atcelta',
+        'Beidzies termiņš'
+    ];
+
 
     if (!in_array($status, $allowedStatuses, true)) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgs receptes statuss.'
@@ -367,13 +458,19 @@ if ($method === 'PUT') {
     $checkPrescription = $pdo->prepare(
         'SELECT id
          FROM prescriptions
-         WHERE id = ? AND deleted_at IS NULL
+         WHERE id = ?
+         AND deleted_at IS NULL
          LIMIT 1'
     );
 
-    $checkPrescription->execute([$id]);
+
+    $checkPrescription->execute([
+        $id
+    ]);
+
 
     if (!$checkPrescription->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Recepte nav atrasta.'
@@ -384,13 +481,20 @@ if ($method === 'PUT') {
     $checkNumber = $pdo->prepare(
         'SELECT id
          FROM prescriptions
-         WHERE prescription_number = ? AND id != ?
+         WHERE prescription_number = ?
+         AND id != ?
          LIMIT 1'
     );
 
-    $checkNumber->execute([$prescriptionNumber, $id]);
+
+    $checkNumber->execute([
+        $prescriptionNumber,
+        $id
+    ]);
+
 
     if ($checkNumber->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Recepte ar šādu numuru jau eksistē.'
@@ -400,15 +504,20 @@ if ($method === 'PUT') {
 
     $checkMedicine = $pdo->prepare(
         'SELECT id
-        FROM medicines
-        WHERE id = ?
-        AND deleted_at IS NULL
-        LIMIT 1'
+         FROM medicines
+         WHERE id = ?
+         AND deleted_at IS NULL
+         LIMIT 1'
     );
 
-    $checkMedicine->execute([$medicineId]);
+
+    $checkMedicine->execute([
+        $medicineId
+    ]);
+
 
     if (!$checkMedicine->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Izvēlētās zāles nav atrastas.'
@@ -423,14 +532,23 @@ if ($method === 'PUT') {
 
         $stmt = $pdo->prepare(
             'UPDATE prescriptions
-             SET prescription_number = ?, patient_name = ?, doctor_name = ?,
-                 issued_at = ?, valid_until = ?, status = ?
-             WHERE id = ? AND deleted_at IS NULL'
+             SET
+                prescription_number = ?,
+                patient_name = ?,
+                personal_code = ?,
+                doctor_name = ?,
+                issued_at = ?,
+                valid_until = ?,
+                status = ?
+             WHERE id = ?
+             AND deleted_at IS NULL'
         );
+
 
         $stmt->execute([
             $prescriptionNumber,
             $patientName,
+            $personalCode,
             $doctorName,
             $issuedAt,
             $validUntil,
@@ -440,18 +558,32 @@ if ($method === 'PUT') {
 
 
         $deleteItemStmt = $pdo->prepare(
-            'DELETE FROM prescription_items WHERE prescription_id = ?'
+            'DELETE FROM prescription_items
+             WHERE prescription_id = ?'
         );
 
-        $deleteItemStmt->execute([$id]);
+
+        $deleteItemStmt->execute([
+            $id
+        ]);
 
 
         $itemStmt = $pdo->prepare(
-            'INSERT INTO prescription_items (prescription_id, medicine_id, quantity)
+            'INSERT INTO prescription_items
+                (
+                    prescription_id,
+                    medicine_id,
+                    quantity
+                )
              VALUES (?, ?, ?)'
         );
 
-        $itemStmt->execute([$id, $medicineId, $quantity]);
+
+        $itemStmt->execute([
+            $id,
+            $medicineId,
+            $quantity
+        ]);
 
 
         $pdo->commit();
@@ -462,11 +594,13 @@ if ($method === 'PUT') {
             'message' => 'Recepte veiksmīgi rediģēta.'
         ]);
 
+
     } catch (PDOException $e) {
 
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
+
 
         jsonResponse([
             'success' => false,
@@ -482,9 +616,14 @@ if ($method === 'PUT') {
 
 if ($method === 'DELETE') {
 
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
+
 
     if (!is_array($data)) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgi nosūtītie dati.'
@@ -494,7 +633,9 @@ if ($method === 'DELETE') {
 
     $id = (int) ($data['id'] ?? 0);
 
+
     if ($id <= 0) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Nederīgs receptes ID.'
@@ -505,13 +646,19 @@ if ($method === 'DELETE') {
     $checkPrescription = $pdo->prepare(
         'SELECT id
          FROM prescriptions
-         WHERE id = ? AND deleted_at IS NULL
+         WHERE id = ?
+         AND deleted_at IS NULL
          LIMIT 1'
     );
 
-    $checkPrescription->execute([$id]);
+
+    $checkPrescription->execute([
+        $id
+    ]);
+
 
     if (!$checkPrescription->fetch()) {
+
         jsonResponse([
             'success' => false,
             'message' => 'Recepte nav atrasta.'
@@ -524,16 +671,21 @@ if ($method === 'DELETE') {
         $stmt = $pdo->prepare(
             'UPDATE prescriptions
              SET deleted_at = NOW()
-             WHERE id = ? AND deleted_at IS NULL'
+             WHERE id = ?
+             AND deleted_at IS NULL'
         );
 
-        $stmt->execute([$id]);
+
+        $stmt->execute([
+            $id
+        ]);
 
 
         jsonResponse([
             'success' => true,
             'message' => 'Recepte veiksmīgi dzēsta.'
         ]);
+
 
     } catch (PDOException $e) {
 

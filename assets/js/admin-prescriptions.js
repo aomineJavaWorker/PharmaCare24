@@ -162,6 +162,11 @@ function renderPrescriptions(prescriptions) {
                     )}
                 </td>
 
+                <td>
+                    ${escapeHtml(
+                        prescription.personal_code
+                    )}
+                </td>
 
                 <td>
                     ${escapeHtml(
@@ -447,6 +452,10 @@ async function openEditPrescription(id) {
             'patientName'
         ).value =
             prescription.patient_name;
+        document.getElementById(
+            'personalCode'
+        ).value =
+            prescription.personal_code;
 
         document.getElementById(
             'doctorName'
