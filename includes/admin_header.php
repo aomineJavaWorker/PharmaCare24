@@ -88,6 +88,25 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 Pasūtījumi
             </a>
 
+            <?php if (isMainAdmin()): ?>
+
+                <a
+                    href="users.php"
+                    class="<?= $currentPage === 'users.php' ? 'active' : '' ?>"
+                >
+                    Lietotāji
+                </a>
+
+
+                <a
+                    href="audit_logs.php"
+                    class="<?= $currentPage === 'audit_logs.php' ? 'active' : '' ?>"
+                >
+                    Darbību žurnāls
+                </a>
+
+            <?php endif; ?>
+
         </nav>
 
     </aside>
@@ -119,7 +138,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     </span>
 
                     <small>
-                        <?= htmlspecialchars($_SESSION['role']) ?>
+
+                        <?= isMainAdmin()
+                            ? 'Galvenais administrators'
+                            : 'Moderators'
+                        ?>
+
                     </small>
 
                 </div>
