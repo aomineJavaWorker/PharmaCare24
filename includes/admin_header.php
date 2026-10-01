@@ -25,8 +25,18 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         href="../assets/css/admin.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="../assets/css/list-tools.css"
+    >
+
     <script
         src="../assets/js/admin-mobile-menu.js"
+        defer
+    ></script>
+
+    <script
+        src="../assets/js/list-tools.js"
         defer
     ></script>
 

@@ -1,0 +1,264 @@
+/* =========================================================
+   MEKLĒŠANA UN LAPOŠANA
+   ========================================================= */
+
+.list-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 18px 0;
+}
+
+
+/* =========================================================
+   MEKLĒŠANA
+   ========================================================= */
+
+.list-search {
+    flex: 1;
+    max-width: 430px;
+}
+
+
+.list-search-input {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 14px;
+
+    border: 1px solid var(--border, #dfe7e1);
+    border-radius: 10px;
+
+    outline: none;
+
+    background-color: var(--surface, #ffffff);
+    color: var(--text, #17221b);
+
+    font: inherit;
+
+    transition: 0.2s;
+}
+
+
+.list-search-input:focus {
+    border-color: var(--primary, #18864b);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(24, 134, 75, 0.12);
+}
+
+
+/* =========================================================
+   LABĀ PUSE
+   ========================================================= */
+
+.list-tools-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 14px;
+}
+
+
+.list-results-count {
+    color: var(--muted, #66746b);
+
+    font-size: 14px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   IERAKSTU SKAITS LAPĀ
+   ========================================================= */
+
+.list-page-size {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    color: var(--muted, #66746b);
+
+    font-size: 14px;
+
+    white-space: nowrap;
+}
+
+
+.list-page-size-select {
+    min-height: 38px;
+
+    padding: 7px 30px 7px 10px;
+
+    border: 1px solid var(--border, #dfe7e1);
+    border-radius: 9px;
+
+    outline: none;
+
+    background-color: var(--surface, #ffffff);
+    color: var(--text, #17221b);
+
+    font: inherit;
+
+    cursor: pointer;
+}
+
+
+.list-page-size-select:focus {
+    border-color: var(--primary, #18864b);
+}
+
+
+/* =========================================================
+   LAPOŠANA
+   ========================================================= */
+
+.list-pagination {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: 20px;
+}
+
+
+.list-page-button {
+    min-width: 40px;
+    min-height: 38px;
+
+    padding: 8px 12px;
+
+    border: 1px solid var(--border, #dfe7e1);
+    border-radius: 9px;
+
+    background-color: var(--surface, #ffffff);
+    color: var(--text, #17221b);
+
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.list-page-button:hover:not(:disabled),
+.list-page-button.active {
+    border-color: var(--primary, #18864b);
+
+    background-color: var(--primary, #18864b);
+    color: #ffffff;
+}
+
+
+.list-page-button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   SVARĪGI — PASLĒPT ELEMENTUS
+   ========================================================= */
+
+/*
+ * medicine-card ir display:flex,
+ * tāpēc skaidri norādām display:none.
+ */
+
+.medicine-card[hidden] {
+    display: none !important;
+}
+
+
+/*
+ * Tas pats administrācijas tabulām.
+ */
+
+.admin-table tbody tr[hidden] {
+    display: none !important;
+}
+
+
+/*
+ * Paslēpj lapošanu, ja ir tikai viena lapa.
+ */
+
+.list-pagination[hidden] {
+    display: none !important;
+}
+
+
+/* =========================================================
+   KLIENTA ZĀĻU KATALOGS
+   ========================================================= */
+
+.catalog-list-tools {
+    margin-top: 28px;
+    margin-bottom: -18px;
+}
+
+
+.catalog-pagination {
+    margin-top: 30px;
+}
+
+
+/* =========================================================
+   RESPONSIVITĀTE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .list-tools {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+
+    .list-search {
+        max-width: none;
+    }
+
+
+    .list-tools-right {
+        justify-content: space-between;
+    }
+
+
+    .list-pagination {
+        justify-content: flex-start;
+    }
+
+
+    .list-page-button {
+        flex: 0 0 auto;
+    }
+}
+
+
+@media (max-width: 430px) {
+
+    .list-tools-right {
+        align-items: stretch;
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+
+    .list-page-size {
+        justify-content: space-between;
+    }
+}

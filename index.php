@@ -71,6 +71,10 @@ $medicines = $stmt->fetchAll();
         href="assets/css/style.css"
 
     >
+    <link
+        rel="stylesheet"
+        href="assets/css/list-tools.css"
+    >
 
 </head>
 
@@ -1192,6 +1196,8 @@ $medicines = $stmt->fetchAll();
 <script src="assets/js/cart.js"></script>
 
 <script src="assets/js/mobile-menu.js"></script>
+
+<script src="assets/js/list-tools.js"></script>
 
 </body>
 
