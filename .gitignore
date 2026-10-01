@@ -1,9 +1,14 @@
 .DS_Store
 Thumbs.db
+
 .vscode/
 .idea/
 
 .env
 
 uploads/*
-!uploads/.gitkeep
+!uploads/medicines/
+!uploads/medicines/*.png
+!uploads/medicines/*.jpg
+!uploads/medicines/*.jpeg
+!uploads/medicines/*.webp
