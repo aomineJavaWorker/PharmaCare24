@@ -172,8 +172,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
                     <span>
                         Sveiki,
-                        <?= htmlspecialchars($_SESSION['username']) ?>!
+                        <?= htmlspecialchars(
+                            $_SESSION['username']
+                        ) ?>!
                     </span>
+
 
                     <small>
 
