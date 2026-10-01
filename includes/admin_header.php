@@ -25,13 +25,22 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         href="../assets/css/admin.css"
     >
 
+    <script
+        src="../assets/js/admin-mobile-menu.js"
+        defer
+    ></script>
+
     <script>
-    window.addEventListener('pageshow', function (event) {
-        if (event.persisted) {
-            window.location.reload();
-        }
-    });
-</script>
+        window.addEventListener(
+            'pageshow',
+            function (event) {
+
+                if (event.persisted) {
+                    window.location.reload();
+                }
+            }
+        );
+    </script>
 
 </head>
 
@@ -43,7 +52,10 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
     <!-- SIDEBAR -->
 
-    <aside class="admin-sidebar">
+    <aside
+        class="admin-sidebar"
+        id="adminSidebar"
+    >
 
         <a
             href="dashboard.php"
@@ -88,6 +100,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 Pasūtījumi
             </a>
 
+
             <?php if (isMainAdmin()): ?>
 
                 <a
@@ -112,6 +125,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     </aside>
 
 
+    <!-- MOBILE BACKDROP -->
+
+    <div
+        class="admin-sidebar-backdrop"
+        id="adminSidebarBackdrop"
+    ></div>
+
+
     <!-- RIGHT SIDE -->
 
     <div class="admin-page">
@@ -119,7 +140,24 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
         <header class="admin-topbar">
 
-            <div>
+
+            <div class="admin-topbar-left">
+
+                <button
+                    type="button"
+                    class="admin-menu-toggle"
+                    id="adminMenuToggle"
+                    aria-label="Atvērt izvēlni"
+                    aria-expanded="false"
+                    aria-controls="adminSidebar"
+                >
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                </button>
+
 
                 <strong>
                     Vadības panelis

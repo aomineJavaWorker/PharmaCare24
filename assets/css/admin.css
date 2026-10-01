@@ -1431,3 +1431,539 @@ body {
     object-fit: contain;
     border-radius: 10px;
 }
+
+
+/* =========================================================
+   ADMIN RESPONSIVE / MOBILE SIDEBAR
+   ========================================================= */
+
+
+/* BURGER */
+
+.admin-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+
+.admin-menu-toggle {
+    width: 42px;
+    height: 42px;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding: 0;
+
+    border: 1px solid #dfe7e1;
+    border-radius: 10px;
+
+    background-color: #ffffff;
+
+    cursor: pointer;
+}
+
+
+.admin-menu-toggle span {
+    width: 20px;
+    height: 2px;
+
+    border-radius: 2px;
+
+    background-color: #163d28;
+
+    transition: 0.2s;
+}
+
+
+.admin-menu-toggle.active span:nth-child(1) {
+    transform:
+        translateY(7px)
+        rotate(45deg);
+}
+
+
+.admin-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+
+.admin-menu-toggle.active span:nth-child(3) {
+    transform:
+        translateY(-7px)
+        rotate(-45deg);
+}
+
+
+.admin-sidebar-backdrop {
+    display: none;
+}
+
+
+/* =========================================================
+   TABLET / SMALL LAPTOP
+   ========================================================= */
+
+@media (max-width: 1024px) {
+
+    body.admin-menu-open {
+        overflow: hidden;
+    }
+
+
+    .admin-layout {
+        display: block;
+    }
+
+
+    /*
+     * SIDEBAR kļūst par drawer
+     */
+
+    .admin-sidebar {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        bottom: 0;
+
+        z-index: 1200;
+
+        width: min(300px, 84vw);
+
+        min-height: 100dvh;
+
+        overflow-y: auto;
+
+        transform: translateX(-105%);
+
+        transition:
+            transform 0.25s ease;
+
+        box-shadow:
+            12px 0 35px
+            rgba(0, 0, 0, 0.18);
+    }
+
+
+    .admin-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+
+    .admin-sidebar-backdrop {
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 1100;
+
+        display: block;
+
+        background-color:
+            rgba(7, 20, 12, 0.48);
+
+        opacity: 0;
+
+        visibility: hidden;
+
+        pointer-events: none;
+
+        transition:
+            opacity 0.2s ease,
+            visibility 0.2s ease;
+    }
+
+
+    .admin-sidebar-backdrop.active {
+        opacity: 1;
+
+        visibility: visible;
+
+        pointer-events: auto;
+    }
+
+
+    .admin-menu-toggle {
+        display: flex;
+    }
+
+
+    /*
+     * Visa platība tagad pieejama saturam
+     */
+
+    .admin-page {
+        width: 100%;
+
+        min-height: 100vh;
+    }
+
+
+    .admin-topbar {
+        position: sticky;
+
+        top: 0;
+
+        z-index: 900;
+
+        min-height: 64px;
+
+        padding:
+            10px 20px;
+    }
+
+
+    .admin-main {
+        padding: 22px;
+    }
+
+
+    /*
+     * Dashboard
+     */
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    /*
+     * Tabulām ļaujam scrollot
+     */
+
+    .table-wrapper {
+        width: 100%;
+
+        overflow-x: auto;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+
+    .admin-table {
+        min-width: 760px;
+    }
+
+
+    .admin-panel {
+        overflow: hidden;
+    }
+}
+
+
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    .admin-topbar {
+        padding:
+            9px 12px;
+
+        gap: 10px;
+    }
+
+
+    .admin-topbar-left {
+        gap: 9px;
+    }
+
+
+    .admin-topbar-left strong {
+        font-size: 14px;
+    }
+
+
+    .admin-menu-toggle {
+        width: 40px;
+        height: 40px;
+
+        flex-shrink: 0;
+    }
+
+
+    /*
+     * Lietotāja informācija
+     */
+
+    .admin-user {
+        gap: 8px;
+    }
+
+
+    .admin-user > div {
+        display: none;
+    }
+
+
+    .logout-button {
+        padding:
+            9px 11px;
+
+        font-size: 13px;
+    }
+
+
+    /*
+     * MAIN
+     */
+
+    .admin-main {
+        padding:
+            16px 12px;
+    }
+
+
+    .admin-main h1 {
+        font-size: 25px;
+    }
+
+
+    /*
+     * Page heading
+     */
+
+    .page-header {
+        align-items: stretch;
+
+        flex-direction: column;
+
+        gap: 14px;
+
+        margin-bottom: 18px;
+    }
+
+
+    .page-header .primary-admin-button {
+        width: 100%;
+    }
+
+
+    /*
+     * Panel
+     */
+
+    .admin-panel,
+    .dashboard-panel {
+        padding: 16px;
+
+        border-radius: 12px;
+    }
+
+
+    .admin-panel-header,
+    .dashboard-panel-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    /*
+     * Dashboard cards
+     */
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+    }
+
+
+    .stat-card {
+        padding: 18px;
+    }
+
+
+    .stat-card strong {
+        font-size: 28px;
+    }
+
+
+    /*
+     * TABLE
+     */
+
+    .table-wrapper {
+        margin:
+            0 -4px;
+
+        padding-bottom: 5px;
+    }
+
+
+    .admin-table {
+        min-width: 720px;
+    }
+
+
+    .admin-table th,
+    .admin-table td {
+        padding:
+            11px 9px;
+
+        font-size: 13px;
+    }
+
+
+    .table-actions {
+        justify-content: flex-start;
+    }
+
+
+    /*
+     * MODAL
+     */
+
+    .admin-modal {
+        align-items: flex-end;
+
+        padding: 8px;
+    }
+
+
+    .admin-modal-content {
+        width: 100%;
+
+        max-height: 94dvh;
+
+        padding:
+            20px 16px;
+
+        border-radius:
+            18px 18px 8px 8px;
+    }
+
+
+    .admin-modal-header {
+        margin-bottom: 18px;
+    }
+
+
+    .admin-modal-header h2 {
+        font-size: 21px;
+    }
+
+
+    /*
+     * Forms
+     */
+
+    .form-grid {
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+    }
+
+
+    .form-group-full {
+        grid-column: auto;
+    }
+
+
+    .form-group input,
+    .form-group select {
+        min-height: 44px;
+
+        font-size: 16px;
+    }
+
+
+    /*
+     * iPhone nepalielina input automātiski,
+     * jo font-size ir vismaz 16px.
+     */
+
+
+    .modal-actions {
+        flex-direction: column-reverse;
+
+        gap: 8px;
+    }
+
+
+    .modal-actions button {
+        width: 100%;
+    }
+
+
+    /*
+     * Orders
+     */
+
+    .order-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .order-item-row {
+        grid-template-columns: 1fr;
+
+        gap: 7px;
+    }
+
+
+    /*
+     * Footer
+     */
+
+    .admin-footer {
+        flex-direction: column;
+
+        gap: 5px;
+
+        padding:
+            15px 12px;
+
+        text-align: center;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .admin-main {
+        padding:
+            12px 8px;
+    }
+
+
+    .admin-panel,
+    .dashboard-panel {
+        padding:
+            12px;
+    }
+
+
+    .admin-main h1 {
+        font-size: 23px;
+    }
+
+
+    .admin-sidebar {
+        width: 88vw;
+    }
+
+
+    .admin-logo {
+        min-height: 64px;
+
+        padding:
+            0 16px;
+    }
+}

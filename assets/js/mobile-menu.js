@@ -1,29 +1,54 @@
-const menuToggle =
-    document.getElementById('menuToggle');
+const adminMenuToggle =
+    document.getElementById(
+        'adminMenuToggle'
+    );
 
-const mainNavigation =
-    document.getElementById('mainNavigation');
+const adminSidebar =
+    document.getElementById(
+        'adminSidebar'
+    );
+
+const adminSidebarBackdrop =
+    document.getElementById(
+        'adminSidebarBackdrop'
+    );
 
 
-if (menuToggle && mainNavigation) {
+if (
+    adminMenuToggle &&
+    adminSidebar &&
+    adminSidebarBackdrop
+) {
 
-    menuToggle.addEventListener(
+    adminMenuToggle.addEventListener(
         'click',
         function () {
 
             const isOpen =
-                mainNavigation.classList.toggle(
-                    'active'
+                adminSidebar.classList.toggle(
+                    'mobile-open'
                 );
 
 
-            menuToggle.classList.toggle(
+            adminSidebarBackdrop.classList.toggle(
                 'active',
                 isOpen
             );
 
 
-            menuToggle.setAttribute(
+            adminMenuToggle.classList.toggle(
+                'active',
+                isOpen
+            );
+
+
+            document.body.classList.toggle(
+                'admin-menu-open',
+                isOpen
+            );
+
+
+            adminMenuToggle.setAttribute(
                 'aria-expanded',
                 isOpen
                     ? 'true'
@@ -31,7 +56,7 @@ if (menuToggle && mainNavigation) {
             );
 
 
-            menuToggle.setAttribute(
+            adminMenuToggle.setAttribute(
                 'aria-label',
                 isOpen
                     ? 'Aizvērt izvēlni'
@@ -41,64 +66,24 @@ if (menuToggle && mainNavigation) {
     );
 
 
-    /*
-     * Aizver izvēlni pēc saites nospiešanas.
-     */
+    adminSidebarBackdrop.addEventListener(
+        'click',
+        closeAdminMenu
+    );
 
-    const navigationLinks =
-        mainNavigation.querySelectorAll(
-            'a'
+
+    adminSidebar
+        .querySelectorAll('a')
+        .forEach(
+            function (link) {
+
+                link.addEventListener(
+                    'click',
+                    closeAdminMenu
+                );
+            }
         );
 
-
-    navigationLinks.forEach(
-        function (link) {
-
-            link.addEventListener(
-                'click',
-                function () {
-
-                    closeMenu();
-                }
-            );
-        }
-    );
-
-
-    /*
-     * Klikšķis ārpus izvēlnes.
-     */
-
-    document.addEventListener(
-        'click',
-        function (event) {
-
-            const clickedInsideMenu =
-                mainNavigation.contains(
-                    event.target
-                );
-
-
-            const clickedToggle =
-                menuToggle.contains(
-                    event.target
-                );
-
-
-            if (
-                !clickedInsideMenu &&
-                !clickedToggle
-            ) {
-
-                closeMenu();
-            }
-        }
-    );
-
-
-    /*
-     * Escape aizver izvēlni.
-     */
 
     document.addEventListener(
         'keydown',
@@ -108,60 +93,66 @@ if (menuToggle && mainNavigation) {
                 event.key === 'Escape'
             ) {
 
-                closeMenu();
+                closeAdminMenu();
             }
         }
     );
 
-
-    /*
-     * Ja ekrāns kļūst desktop izmērā,
-     * noņemam mobilās izvēlnes stāvokli.
-     */
 
     window.addEventListener(
         'resize',
         function () {
 
             if (
-                window.innerWidth > 900
+                window.innerWidth > 1024
             ) {
 
-                closeMenu();
+                closeAdminMenu();
             }
         }
     );
 }
 
 
-function closeMenu() {
+function closeAdminMenu() {
 
     if (
-        !menuToggle ||
-        !mainNavigation
+        !adminMenuToggle ||
+        !adminSidebar ||
+        !adminSidebarBackdrop
     ) {
 
         return;
     }
 
 
-    mainNavigation.classList.remove(
+    adminSidebar.classList.remove(
+        'mobile-open'
+    );
+
+
+    adminSidebarBackdrop.classList.remove(
         'active'
     );
 
 
-    menuToggle.classList.remove(
+    adminMenuToggle.classList.remove(
         'active'
     );
 
 
-    menuToggle.setAttribute(
+    document.body.classList.remove(
+        'admin-menu-open'
+    );
+
+
+    adminMenuToggle.setAttribute(
         'aria-expanded',
         'false'
     );
 
 
-    menuToggle.setAttribute(
+    adminMenuToggle.setAttribute(
         'aria-label',
         'Atvērt izvēlni'
     );
