@@ -2232,3 +2232,85 @@ body {
         width: 100%;
     }
 }
+
+/* =========================================================
+   LIETOTĀJU TABULAS DARBĪBAS
+   ========================================================= */
+
+.users-table th:last-child,
+.users-table td:last-child {
+    width: 210px;
+    min-width: 210px;
+}
+
+
+.users-table .table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 8px;
+
+    min-width: 170px;
+}
+
+
+.users-table .table-action-button {
+    min-width: 76px;
+
+    text-align: center;
+}
+
+/* =========================================================
+   CRUD TABULU DARBĪBU KOLONNA
+   ========================================================= */
+
+.actions-table th:last-child,
+.actions-table td:last-child {
+    width: 190px;
+    min-width: 190px;
+
+    white-space: nowrap;
+}
+
+
+.actions-table .table-actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 8px;
+
+    min-width: 170px;
+}
+
+
+.actions-table .table-action-button {
+    min-width: 72px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    white-space: nowrap;
+}
+
+
+/* Rediģēt */
+
+.actions-table .edit-action-button,
+.actions-table .edit-user-button {
+    min-width: 76px;
+}
+
+
+/* Dzēst */
+
+.actions-table .delete-action-button,
+.actions-table .delete-user-button {
+    min-width: 62px;
+}

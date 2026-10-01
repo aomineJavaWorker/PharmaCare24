@@ -28,7 +28,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
     </div>
 
     <div class="table-wrapper">
-        <table class="admin-table">
+        <table class="admin-table actions-table">
             <thead>
                 <tr>
                     <th>ID</th>

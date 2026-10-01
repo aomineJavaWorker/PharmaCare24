@@ -13,9 +13,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
     <div>
 
-        <h1>
-            Lietotāji
-        </h1>
+        <h1>Lietotāji</h1>
 
         <p>
             Pārvaldības sistēmas lietotāju pārvaldība.
@@ -23,13 +21,12 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
     </div>
 
-
     <button
         type="button"
         id="openUserModal"
         class="primary-admin-button"
     >
-        + Pievienot moderatoru
+        + Pievienot lietotāju
     </button>
 
 </div>
@@ -41,15 +38,11 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
         <div>
 
-            <h2>
-                Sistēmas lietotāji
-            </h2>
+            <h2>Sistēmas lietotāji</h2>
 
             <p>
                 Kopā:
-                <strong id="userCount">
-                    0
-                </strong>
+                <strong id="userCount">0</strong>
             </p>
 
         </div>
@@ -67,7 +60,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
     <div class="table-wrapper">
 
-        <table class="admin-table">
+        <table class="admin-table actions-table users-table">
 
             <thead>
 
@@ -77,6 +70,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
                     <th>Loma</th>
                     <th>Izveidots</th>
                     <th>Atjaunināts</th>
+                    <th>Darbības</th>
                 </tr>
 
             </thead>
@@ -92,7 +86,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
 </section>
 
 
-<!-- MODAL -->
+<!-- LIETOTĀJA MODĀLAIS LOGS -->
 
 <div
     id="userModal"
@@ -101,26 +95,25 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
     <div class="admin-modal-content">
 
-
         <div class="admin-modal-header">
 
             <div>
 
-                <h2>
-                    Pievienot moderatoru
+                <h2 id="userModalTitle">
+                    Pievienot lietotāju
                 </h2>
 
-                <p>
-                    Izveidojiet jaunu moderatora kontu.
+                <p id="userModalDescription">
+                    Izveidojiet jaunu sistēmas lietotāju.
                 </p>
 
             </div>
-
 
             <button
                 type="button"
                 id="closeUserModal"
                 class="admin-modal-close"
+                aria-label="Aizvērt"
             >
                 ×
             </button>
@@ -129,6 +122,12 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
 
         <form id="userForm">
+
+            <input
+                type="hidden"
+                id="userId"
+                value=""
+            >
 
 
             <div
@@ -139,7 +138,6 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
             <div class="form-grid">
 
-
                 <div class="form-group">
 
                     <label for="newUsername">
@@ -149,7 +147,6 @@ require_once __DIR__ . '/../includes/admin_header.php';
                     <input
                         type="text"
                         id="newUsername"
-                        name="username"
                         minlength="3"
                         maxlength="50"
                         required
@@ -160,14 +157,40 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
                 <div class="form-group">
 
-                    <label for="newPassword">
+                    <label for="userRole">
+                        Loma *
+                    </label>
+
+                    <select
+                        id="userRole"
+                        required
+                    >
+
+                        <option value="moderator">
+                            Moderators
+                        </option>
+
+                        <option value="admin">
+                            Administrators
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label
+                        for="newPassword"
+                        id="passwordLabel"
+                    >
                         Parole *
                     </label>
 
                     <input
                         type="password"
                         id="newPassword"
-                        name="password"
                         minlength="8"
                         required
                     >
@@ -177,22 +200,37 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
                 <div class="form-group">
 
-                    <label for="confirmPassword">
+                    <label
+                        for="confirmPassword"
+                        id="confirmPasswordLabel"
+                    >
                         Atkārtot paroli *
                     </label>
 
                     <input
                         type="password"
                         id="confirmPassword"
-                        name="password_confirm"
                         minlength="8"
                         required
                     >
 
                 </div>
 
-
             </div>
+
+
+            <p
+                id="passwordHint"
+                style="
+                    display:none;
+                    margin-top:12px;
+                    color:#758078;
+                    font-size:13px;
+                "
+            >
+                Atstājiet paroles laukus tukšus,
+                ja nevēlaties mainīt paroli.
+            </p>
 
 
             <div class="modal-actions">
@@ -208,13 +246,13 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
                 <button
                     type="submit"
+                    id="saveUserButton"
                     class="primary-admin-button"
                 >
-                    Izveidot moderatoru
+                    Izveidot lietotāju
                 </button>
 
             </div>
-
 
         </form>
 

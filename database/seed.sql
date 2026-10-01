@@ -81,7 +81,8 @@ INSERT INTO medicines (
 )
 VALUES
 (
-    1, 1,
+    1,
+    1,
     'Paracetamol',
     'Paracetamols',
     'paracetamol',
@@ -94,7 +95,8 @@ VALUES
     'uploads/medicines/Paracetamol.png'
 ),
 (
-    2, 1,
+    2,
+    1,
     'Ibuprofen',
     'Ibuprofēns',
     'ibuprofen',
@@ -107,7 +109,8 @@ VALUES
     'uploads/medicines/Ibuprofen.png'
 ),
 (
-    3, 2,
+    3,
+    2,
     'Vitamin D3',
     'Holekalciferols',
     'cholecalciferol',
@@ -120,7 +123,8 @@ VALUES
     'uploads/medicines/Vitamin_D3.png'
 ),
 (
-    4, 3,
+    4,
+    3,
     'Cetirizins',
     'Cetirizīns',
     'cetirizine',
@@ -133,7 +137,8 @@ VALUES
     'uploads/medicines/Cetirizins.png'
 ),
 (
-    5, 4,
+    5,
+    4,
     'Otrivin',
     'Ksilometazolīns',
     'xylometazoline',
@@ -146,7 +151,8 @@ VALUES
     'uploads/medicines/Otrivin.png'
 ),
 (
-    6, 4,
+    6,
+    4,
     'Strepsils',
     'Amilmetakrezols',
     'amylmetacresol',
@@ -159,7 +165,8 @@ VALUES
     'uploads/medicines/Strepsils.png'
 ),
 (
-    7, 5,
+    7,
+    5,
     'Smecta',
     'Diosmektīts',
     'diosmectite',
@@ -172,7 +179,8 @@ VALUES
     'uploads/medicines/Smecta.png'
 ),
 (
-    8, 1,
+    8,
+    1,
     'Voltaren',
     'Diklofenaks',
     'diclofenac',
@@ -185,7 +193,8 @@ VALUES
     'uploads/medicines/Voltaren.png'
 ),
 (
-    9, 2,
+    9,
+    2,
     'Magne B6',
     'Magnijs un B6 vitamīns',
     'pyridoxine',
@@ -198,7 +207,8 @@ VALUES
     'uploads/medicines/Magne_B6.png'
 ),
 (
-    10, 3,
+    10,
+    3,
     'Suprastin',
     'Hloropiramīns',
     'chloropyramine',
@@ -211,7 +221,8 @@ VALUES
     'uploads/medicines/Suprastin.png'
 ),
 (
-    11, 4,
+    11,
+    4,
     'Septolete',
     'Benzidamīns',
     'benzydamine',
@@ -224,7 +235,8 @@ VALUES
     'uploads/medicines/Septolete.png'
 ),
 (
-    12, 1,
+    12,
+    1,
     'No-Spa',
     'Drotaverīns',
     'drotaverine',
@@ -237,7 +249,8 @@ VALUES
     'uploads/medicines/No-Spa.png'
 ),
 (
-    13, 1,
+    13,
+    1,
     'Aspirin',
     'Acetilsalicilskābe',
     'acetylsalicylic acid',
@@ -250,7 +263,8 @@ VALUES
     'uploads/medicines/Aspirin.png'
 ),
 (
-    14, 4,
+    14,
+    4,
     'ACC',
     'Acetilcisteīns',
     'acetylcysteine',
@@ -263,7 +277,8 @@ VALUES
     'uploads/medicines/ACC.png'
 ),
 (
-    15, 2,
+    15,
+    2,
     'Vitamin C',
     'Askorbīnskābe',
     'ascorbic acid',
@@ -295,151 +310,151 @@ VALUES
 (
     1,
     'R-2026-0001',
-    'Testa Pacients 1',
-    '999999-00001',
+    'Jānis Bērziņš',
+    '010190-10001',
     'Dr. Bērziņš',
     '2026-09-01',
-    '2026-10-01',
+    '2026-12-01',
     'Aktīva'
 ),
 (
     2,
     'R-2026-0002',
-    'Testa Pacients 2',
-    '999999-00002',
+    'Anna Ozola',
+    '020291-10002',
     'Dr. Ozola',
     '2026-09-02',
-    '2026-10-02',
+    '2026-12-02',
     'Aktīva'
 ),
 (
     3,
     'R-2026-0003',
-    'Testa Pacients 3',
-    '999999-00003',
+    'Mārtiņš Kalniņš',
+    '030392-10003',
     'Dr. Kalniņš',
     '2026-09-03',
-    '2026-10-03',
+    '2026-12-03',
     'Izmantota'
 ),
 (
     4,
     'R-2026-0004',
-    'Testa Pacients 4',
-    '999999-00004',
+    'Laura Liepa',
+    '040493-10004',
     'Dr. Liepa',
     '2026-09-04',
-    '2026-10-04',
+    '2026-12-04',
     'Aktīva'
 ),
 (
     5,
     'R-2026-0005',
-    'Testa Pacients 5',
-    '999999-00005',
+    'Roberts Jansons',
+    '050594-10005',
     'Dr. Jansons',
     '2026-09-05',
-    '2026-10-05',
+    '2026-12-05',
     'Atcelta'
 ),
 (
     6,
     'R-2026-0006',
-    'Testa Pacients 6',
-    '999999-00006',
+    'Elīna Krūmiņa',
+    '060695-10006',
     'Dr. Bērziņš',
     '2026-09-06',
-    '2026-10-06',
+    '2026-12-06',
     'Aktīva'
 ),
 (
     7,
     'R-2026-0007',
-    'Testa Pacients 7',
-    '999999-00007',
+    'Artūrs Vītols',
+    '070796-10007',
     'Dr. Ozola',
     '2026-09-07',
-    '2026-10-07',
+    '2026-12-07',
     'Aktīva'
 ),
 (
     8,
     'R-2026-0008',
-    'Testa Pacients 8',
-    '999999-00008',
+    'Ieva Priede',
+    '080897-10008',
     'Dr. Kalniņš',
     '2026-09-08',
-    '2026-10-08',
+    '2026-12-08',
     'Izmantota'
 ),
 (
     9,
     'R-2026-0009',
-    'Testa Pacients 9',
-    '999999-00009',
+    'Kristaps Zariņš',
+    '090998-10009',
     'Dr. Liepa',
     '2026-09-09',
-    '2026-10-09',
+    '2026-12-09',
     'Aktīva'
 ),
 (
     10,
     'R-2026-0010',
-    'Testa Pacients 10',
-    '999999-00010',
+    'Līga Siliņa',
+    '101099-10010',
     'Dr. Jansons',
     '2026-09-10',
-    '2026-10-10',
+    '2026-12-10',
     'Aktīva'
 ),
 (
     11,
     'R-2026-0011',
-    'Testa Pacients 11',
-    '999999-00011',
+    'Rihards Lapiņš',
+    '111100-10011',
     'Dr. Bērziņš',
     '2026-09-11',
-    '2026-10-11',
+    '2026-12-11',
     'Aktīva'
 ),
 (
     12,
     'R-2026-0012',
-    'Testa Pacients 12',
-    '999999-00012',
+    'Kate Gailīte',
+    '121201-10012',
     'Dr. Ozola',
     '2026-09-12',
-    '2026-10-12',
+    '2026-12-12',
     'Aktīva'
 ),
 (
     13,
     'R-2026-0013',
-    'Testa Pacients 13',
-    '999999-00013',
+    'Edgars Eglītis',
+    '131302-10013',
     'Dr. Kalniņš',
     '2026-09-13',
-    '2026-10-13',
+    '2026-12-13',
     'Izmantota'
 ),
 (
     14,
     'R-2026-0014',
-    'Testa Pacients 14',
-    '999999-00014',
+    'Marta Balode',
+    '141403-10014',
     'Dr. Liepa',
     '2026-09-14',
-    '2026-10-14',
+    '2026-12-14',
     'Aktīva'
 ),
 (
     15,
     'R-2026-0015',
-    'Testa Pacients 15',
-    '999999-00015',
+    'Andris Pētersons',
+    '151504-10015',
     'Dr. Jansons',
     '2026-09-15',
-    '2026-10-15',
+    '2026-12-15',
     'Aktīva'
 );
 
@@ -455,19 +470,19 @@ INSERT INTO prescription_items (
 )
 VALUES
 (1, 10, 1),
-(2, 4, 1),
+(2, 13, 1),
 (3, 10, 2),
-(4, 4, 1),
+(4, 13, 1),
 (5, 10, 1),
-(6, 4, 2),
+(6, 13, 2),
 (7, 10, 1),
-(8, 4, 1),
+(8, 13, 1),
 (9, 10, 1),
-(10, 4, 2),
+(10, 13, 2),
 (11, 10, 1),
-(12, 4, 1),
+(12, 13, 1),
 (13, 10, 1),
-(14, 4, 2),
+(14, 13, 2),
 (15, 10, 1);
 
 
@@ -479,8 +494,17 @@ INSERT INTO orders (
     id,
     customer_name,
     customer_email,
+
+    delivery_name,
+    delivery_address,
+    delivery_city,
+    delivery_postal_code,
+    delivery_country,
+
     status,
     payment_status,
+    stripe_session_id,
+
     total
 )
 VALUES
@@ -488,120 +512,255 @@ VALUES
     1,
     'Jānis Bērziņš',
     'janis.berzins@example.com',
+
+    'Jānis Bērziņš',
+    'Brīvības iela 10-4',
+    'Liepāja',
+    'LV-3401',
+    'LV',
+
     'Jauns',
     'Neapmaksāts',
+    NULL,
+
     5.68
 ),
 (
     2,
     'Anna Ozola',
     'anna.ozola@example.com',
+
+    'Anna Ozola',
+    'Krišjāņa Barona iela 25-8',
+    'Rīga',
+    'LV-1011',
+    'LV',
+
     'Apstrādē',
     'Apmaksāts',
+    NULL,
+
     6.99
 ),
 (
     3,
     'Mārtiņš Kalniņš',
     'martins.kalnins@example.com',
+
+    'Mārtiņš Kalniņš',
+    'Lielā iela 14-3',
+    'Jelgava',
+    'LV-3001',
+    'LV',
+
     'Gatavs',
     'Apmaksāts',
+    NULL,
+
     10.20
 ),
 (
     4,
     'Laura Liepa',
     'laura.liepa@example.com',
+
+    'Laura Liepa',
+    'Kuldīgas iela 8-12',
+    'Ventspils',
+    'LV-3601',
+    'LV',
+
     'Izsniegts',
     'Apmaksāts',
+    NULL,
+
     4.89
 ),
 (
     5,
     'Roberts Jansons',
     'roberts.jansons@example.com',
+
+    'Roberts Jansons',
+    'Rīgas iela 21-5',
+    'Daugavpils',
+    'LV-5401',
+    'LV',
+
     'Jauns',
     'Neapmaksāts',
+    NULL,
+
     12.69
 ),
 (
     6,
     'Elīna Krūmiņa',
     'elina.krumina@example.com',
+
+    'Elīna Krūmiņa',
+    'Jomas iela 31-7',
+    'Jūrmala',
+    'LV-2015',
+    'LV',
+
     'Apstrādē',
     'Apmaksāts',
+    NULL,
+
     8.90
 ),
 (
     7,
     'Artūrs Vītols',
     'arturs.vitols@example.com',
+
+    'Artūrs Vītols',
+    'Rīgas iela 16-2',
+    'Valmiera',
+    'LV-4201',
+    'LV',
+
     'Gatavs',
     'Apmaksāts',
+    NULL,
+
     9.40
 ),
 (
     8,
     'Ieva Priede',
     'ieva.priede@example.com',
+
+    'Ieva Priede',
+    'Atbrīvošanas aleja 45-9',
+    'Rēzekne',
+    'LV-4601',
+    'LV',
+
     'Izsniegts',
     'Apmaksāts',
+    NULL,
+
     5.99
 ),
 (
     9,
     'Kristaps Zariņš',
     'kristaps.zarins@example.com',
+
+    'Kristaps Zariņš',
+    'Brīvības iela 6-14',
+    'Ogre',
+    'LV-5001',
+    'LV',
+
     'Jauns',
     'Neapmaksāts',
+    NULL,
+
     7.80
 ),
 (
     10,
     'Līga Siliņa',
     'liga.silina@example.com',
+
+    'Līga Siliņa',
+    'Rīgas iela 20-6',
+    'Cēsis',
+    'LV-4101',
+    'LV',
+
     'Atcelts',
     'Neapmaksāts',
+    NULL,
+
     4.99
 ),
 (
     11,
     'Rihards Lapiņš',
     'rihards.lapins@example.com',
+
+    'Rihards Lapiņš',
+    'Baznīcas iela 12-3',
+    'Kuldīga',
+    'LV-3301',
+    'LV',
+
     'Jauns',
     'Neapmaksāts',
+    NULL,
+
     9.40
 ),
 (
     12,
     'Kate Gailīte',
     'kate.gailite@example.com',
+
+    'Kate Gailīte',
+    'Jelgavas iela 18-5',
+    'Saldus',
+    'LV-3801',
+    'LV',
+
     'Apstrādē',
     'Apmaksāts',
+    NULL,
+
     11.48
 ),
 (
     13,
     'Edgars Eglītis',
     'edgars.eglitis@example.com',
+
+    'Edgars Eglītis',
+    'Pils iela 9-11',
+    'Tukums',
+    'LV-3101',
+    'LV',
+
     'Gatavs',
     'Apmaksāts',
+    NULL,
+
     7.00
 ),
 (
     14,
     'Marta Balode',
     'marta.balode@example.com',
+
+    'Marta Balode',
+    'Leona Paegles iela 17-4',
+    'Sigulda',
+    'LV-2150',
+    'LV',
+
     'Izsniegts',
     'Apmaksāts',
+    NULL,
+
     13.98
 ),
 (
     15,
     'Andris Pētersons',
     'andris.petersons@example.com',
+
+    'Andris Pētersons',
+    'Kalna iela 5-2',
+    'Bauska',
+    'LV-3901',
+    'LV',
+
     'Jauns',
     'Neapmaksāts',
+    NULL,
+
     15.60
 );
 
@@ -644,6 +803,7 @@ VALUES
 
 (12, 1, NULL, 1, 2.49),
 (12, 13, NULL, 1, 3.50),
+(12, 6, NULL, 1, 5.49),
 
 (13, 13, NULL, 2, 3.50),
 

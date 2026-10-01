@@ -20,6 +20,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
     <title>Aptieka | Administrācija</title>
 
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/img/favicon.png"
+    >
+
     <link
         rel="stylesheet"
         href="../assets/css/admin.css"

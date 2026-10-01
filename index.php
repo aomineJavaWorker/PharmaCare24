@@ -63,7 +63,11 @@ $medicines = $stmt->fetchAll();
     >
 
     <title>Aptieka</title>
-
+    <link
+        rel="icon"
+        type="image/png"
+        href="assets/img/favicon.png"
+    >
     <link
 
         rel="stylesheet"
@@ -245,25 +249,13 @@ $medicines = $stmt->fetchAll();
 
             </div>
 
-            <div class="hero-card">
+            <div class="hero-card hero-photo-card">
 
-                <div class="pharmacy-symbol">
-
-                    +
-
-                </div>
-
-                <h2>
-
-                    Aptieka
-
-                </h2>
-
-                <p>
-
-                    Veselība sākas ar rūpēm.
-
-                </p>
+                <img
+                    src="assets/img/pharmacy-hero.png"
+                    alt="Mūsdienīga aptieka un medikamenti"
+                    class="hero-photo"
+                >
 
             </div>
 

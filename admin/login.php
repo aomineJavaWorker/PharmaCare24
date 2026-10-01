@@ -103,6 +103,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <title>Autorizācija | Aptieka</title>
 
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/img/favicon.png"
+    >
+
 </head>
 
 <body class="login-page">

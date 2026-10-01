@@ -218,6 +218,21 @@ body {
     color: var(--muted);
 }
 
+.hero-photo-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+
+.hero-photo {
+    width: 100%;
+    min-height: 350px;
+
+    display: block;
+
+    object-fit: cover;
+}
+
 /* =========================================================
    SECTIONS
    ========================================================= */
@@ -1485,6 +1500,15 @@ body {
 
     .payment-result-card {
         padding: 32px 22px;
+    }
+
+    .hero-photo-card {
+        padding: 0;
+    }
+
+
+    .hero-photo {
+        min-height: 280px;
     }
 }
 

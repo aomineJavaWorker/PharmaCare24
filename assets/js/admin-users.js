@@ -25,6 +25,62 @@ const userForm =
 const userFormMessage =
     document.getElementById('userFormMessage');
 
+const userModalTitle =
+    document.getElementById('userModalTitle');
+
+const userModalDescription =
+    document.getElementById(
+        'userModalDescription'
+    );
+
+const userId =
+    document.getElementById('userId');
+
+const newUsername =
+    document.getElementById('newUsername');
+
+const userRole =
+    document.getElementById('userRole');
+
+const newPassword =
+    document.getElementById('newPassword');
+
+const confirmPassword =
+    document.getElementById(
+        'confirmPassword'
+    );
+
+const passwordLabel =
+    document.getElementById(
+        'passwordLabel'
+    );
+
+const confirmPasswordLabel =
+    document.getElementById(
+        'confirmPasswordLabel'
+    );
+
+const passwordHint =
+    document.getElementById(
+        'passwordHint'
+    );
+
+const saveUserButton =
+    document.getElementById(
+        'saveUserButton'
+    );
+
+
+let usersCache = [];
+
+let currentUserId = null;
+
+let editMode = false;
+
+
+/* =========================================================
+   IELĀDĒJAM LIETOTĀJUS
+   ========================================================= */
 
 loadUsers();
 
@@ -72,8 +128,18 @@ async function loadUsers() {
         }
 
 
+        usersCache =
+            result.data ?? [];
+
+
+        currentUserId =
+            Number(
+                result.current_user_id
+            );
+
+
         renderUsers(
-            result.data
+            usersCache
         );
 
 
@@ -81,6 +147,9 @@ async function loadUsers() {
 
         console.error(error);
 
+
+        userMessage.style.display =
+            'block';
 
         userMessage.textContent =
             'Neizdevās ielādēt lietotājus.';
@@ -91,6 +160,10 @@ async function loadUsers() {
     }
 }
 
+
+/* =========================================================
+   TABULA
+   ========================================================= */
 
 function renderUsers(users) {
 
@@ -124,7 +197,7 @@ function renderUsers(users) {
 
         const roleName =
             user.role === 'admin'
-                ? 'Galvenais administrators'
+                ? 'Administrators'
                 : 'Moderators';
 
 
@@ -157,7 +230,77 @@ function renderUsers(users) {
                     user.updated_at
                 )}
             </td>
+
+            <td>
+
+                <div class="table-actions">
+
+                    <button
+                        type="button"
+                        class="table-action-button edit-user-button"
+                    >
+                        Rediģēt
+                    </button>
+
+                    ${
+                        Number(user.id) !==
+                        currentUserId
+                            ? `
+                                <button
+                                    type="button"
+                                    class="
+                                        table-action-button
+                                        delete-action-button
+                                        delete-user-button
+                                    "
+                                >
+                                    Dzēst
+                                </button>
+                              `
+                            : ''
+                    }
+
+                </div>
+
+            </td>
         `;
+
+
+        const editButton =
+            row.querySelector(
+                '.edit-user-button'
+            );
+
+
+        editButton.addEventListener(
+            'click',
+            function () {
+
+                openEditModal(
+                    user
+                );
+            }
+        );
+
+
+        const deleteButton =
+            row.querySelector(
+                '.delete-user-button'
+            );
+
+
+        if (deleteButton) {
+
+            deleteButton.addEventListener(
+                'click',
+                function () {
+
+                    deleteUser(
+                        user
+                    );
+                }
+            );
+        }
 
 
         userTableBody.appendChild(
@@ -167,22 +310,172 @@ function renderUsers(users) {
 }
 
 
+/* =========================================================
+   CREATE MODAL
+   ========================================================= */
+
 openUserModal.addEventListener(
     'click',
-    function () {
-
-        userForm.reset();
-
-        clearMessage();
-
-        userModal.classList.add(
-            'active'
-        );
-
-        document.body.style.overflow =
-            'hidden';
-    }
+    openCreateModal
 );
+
+
+function openCreateModal() {
+
+    editMode = false;
+
+
+    userForm.reset();
+
+    userId.value = '';
+
+
+    userRole.value =
+        'moderator';
+
+
+    userModalTitle.textContent =
+        'Pievienot lietotāju';
+
+
+    userModalDescription.textContent =
+        'Izveidojiet jaunu administratora vai moderatora kontu.';
+
+
+    saveUserButton.textContent =
+        'Izveidot lietotāju';
+
+
+    passwordLabel.textContent =
+        'Parole *';
+
+
+    confirmPasswordLabel.textContent =
+        'Atkārtot paroli *';
+
+
+    newPassword.required =
+        true;
+
+
+    confirmPassword.required =
+        true;
+
+
+    passwordHint.style.display =
+        'none';
+
+
+    clearMessage();
+
+
+    openModal();
+}
+
+
+/* =========================================================
+   EDIT MODAL
+   ========================================================= */
+
+function openEditModal(user) {
+
+    editMode = true;
+
+
+    userForm.reset();
+
+
+    userId.value =
+        user.id;
+
+
+    newUsername.value =
+        user.username;
+
+
+    userRole.value =
+        user.role;
+
+
+    newPassword.value = '';
+
+    confirmPassword.value = '';
+
+
+    userModalTitle.textContent =
+        'Rediģēt lietotāju';
+
+
+    userModalDescription.textContent =
+        `Rediģējiet lietotāja "${user.username}" datus.`;
+
+
+    saveUserButton.textContent =
+        'Saglabāt izmaiņas';
+
+
+    passwordLabel.textContent =
+        'Jaunā parole';
+
+
+    confirmPasswordLabel.textContent =
+        'Atkārtot jauno paroli';
+
+
+    newPassword.required =
+        false;
+
+
+    confirmPassword.required =
+        false;
+
+
+    passwordHint.style.display =
+        'block';
+
+
+    /*
+     * Pašreizējais admins pats sev
+     * nevar noņemt administratora lomu.
+     */
+
+    if (
+        Number(user.id) ===
+        currentUserId
+    ) {
+
+        userRole.value =
+            'admin';
+
+        userRole.disabled =
+            true;
+
+    } else {
+
+        userRole.disabled =
+            false;
+    }
+
+
+    clearMessage();
+
+    openModal();
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+function openModal() {
+
+    userModal.classList.add(
+        'active'
+    );
+
+    document.body.style.overflow =
+        'hidden';
+}
 
 
 function closeModal() {
@@ -191,10 +484,19 @@ function closeModal() {
         'active'
     );
 
+
     document.body.style.overflow =
         '';
 
+
+    userRole.disabled =
+        false;
+
+
     userForm.reset();
+
+    userId.value = '';
+
 
     clearMessage();
 }
@@ -226,6 +528,27 @@ userModal.addEventListener(
 );
 
 
+document.addEventListener(
+    'keydown',
+    function (event) {
+
+        if (
+            event.key === 'Escape' &&
+            userModal.classList.contains(
+                'active'
+            )
+        ) {
+
+            closeModal();
+        }
+    }
+);
+
+
+/* =========================================================
+   SAGLABĀŠANA
+   ========================================================= */
+
 userForm.addEventListener(
     'submit',
     async function (event) {
@@ -236,27 +559,44 @@ userForm.addEventListener(
         const data = {
 
             username:
-                document
-                    .getElementById(
-                        'newUsername'
-                    )
+                newUsername
                     .value
                     .trim(),
 
+            role:
+                userRole.disabled
+                    ? 'admin'
+                    : userRole.value,
+
             password:
-                document
-                    .getElementById(
-                        'newPassword'
-                    )
-                    .value,
+                newPassword.value,
 
             password_confirm:
-                document
-                    .getElementById(
-                        'confirmPassword'
-                    )
-                    .value
+                confirmPassword.value
         };
+
+
+        if (editMode) {
+
+            data.id =
+                Number(
+                    userId.value
+                );
+
+        } else {
+
+            if (
+                data.password.length < 8
+            ) {
+
+                showMessage(
+                    'Parolei jābūt vismaz 8 simbolus garai.',
+                    'error'
+                );
+
+                return;
+            }
+        }
 
 
         if (
@@ -279,7 +619,10 @@ userForm.addEventListener(
                 await fetch(
                     '../api/users.php',
                     {
-                        method: 'POST',
+                        method:
+                            editMode
+                                ? 'PUT'
+                                : 'POST',
 
                         headers: {
                             'Content-Type':
@@ -305,7 +648,7 @@ userForm.addEventListener(
 
                 showMessage(
                     result.message
-                    ?? 'Neizdevās izveidot moderatoru.',
+                    ?? 'Neizdevās saglabāt lietotāju.',
                     'error'
                 );
 
@@ -342,6 +685,83 @@ userForm.addEventListener(
 );
 
 
+/* =========================================================
+   DZĒŠANA
+   ========================================================= */
+
+async function deleteUser(user) {
+
+    const confirmed =
+        confirm(
+            `Vai tiešām dzēst lietotāju "${user.username}"?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                '../api/users.php',
+                {
+                    method: 'DELETE',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:
+                        JSON.stringify({
+                            id:
+                                Number(
+                                    user.id
+                                )
+                        })
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            alert(
+                result.message
+                ?? 'Neizdevās dzēst lietotāju.'
+            );
+
+            return;
+        }
+
+
+        await loadUsers();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'Neizdevās sazināties ar serveri.'
+        );
+    }
+}
+
+
+/* =========================================================
+   PALĪGFUNKCIJAS
+   ========================================================= */
+
 function showMessage(
     message,
     type
@@ -357,7 +777,8 @@ function showMessage(
 
 function clearMessage() {
 
-    userFormMessage.textContent = '';
+    userFormMessage.textContent =
+        '';
 
     userFormMessage.className =
         'form-message';
