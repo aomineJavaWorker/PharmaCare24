@@ -1377,3 +1377,57 @@ body {
     }
 
 }
+
+/* =========================
+   MEDICINE IMAGE UPLOAD
+   ========================= */
+
+.form-group-full {
+    grid-column: 1 / -1;
+}
+
+.form-help {
+    display: block;
+    margin-top: 7px;
+    color: #7a847d;
+    font-size: 12px;
+}
+
+.form-group input[type="file"] {
+    padding: 9px;
+    cursor: pointer;
+}
+
+.form-group input[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 8px 12px;
+    border: 1px solid #dfe7e1;
+    border-radius: 8px;
+    background: #f5f9f6;
+    color: #163d28;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.medicine-image-preview {
+    width: 100%;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px dashed #cbd8ce;
+    border-radius: 12px;
+    background: #f8fbf9;
+    color: #7a847d;
+}
+
+.medicine-image-preview img {
+    max-width: 100%;
+    max-height: 220px;
+    display: block;
+    object-fit: contain;
+    border-radius: 10px;
+}

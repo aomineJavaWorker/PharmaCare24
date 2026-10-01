@@ -34,7 +34,40 @@ const orderModalTitle =
     document.getElementById('orderModalTitle');
 
 
+const openCreateOrderModal =
+    document.getElementById('openCreateOrderModal');
+
+const createOrderModal =
+    document.getElementById('createOrderModal');
+
+const closeCreateOrderModal =
+    document.getElementById('closeCreateOrderModal');
+
+const cancelCreateOrderModal =
+    document.getElementById('cancelCreateOrderModal');
+
+const createOrderForm =
+    document.getElementById('createOrderForm');
+
+const createOrderFormMessage =
+    document.getElementById('createOrderFormMessage');
+
+const createOrderItems =
+    document.getElementById('createOrderItems');
+
+const addOrderItemButton =
+    document.getElementById('addOrderItemButton');
+
+const createOrderTotal =
+    document.getElementById('createOrderTotal');
+
+
+let availableMedicines = [];
+
+
 loadOrders();
+
+loadOrderMedicines();
 
 
 /* =========================
@@ -99,24 +132,709 @@ async function loadOrders() {
 
 
 /* =========================
+   ZĀLES JAUNAM PASŪTĪJUMAM
+   ========================= */
+
+async function loadOrderMedicines() {
+
+    try {
+
+        const response =
+            await fetch(
+                '../api/medicines.php'
+            );
+
+
+        if (response.status === 401) {
+
+            window.location.href =
+                'login.php';
+
+            return;
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message
+            );
+        }
+
+
+        availableMedicines =
+            result.data.filter(
+                function (medicine) {
+
+                    return (
+                        Number(
+                            medicine.prescription_required
+                        ) === 0
+                        &&
+                        Number(
+                            medicine.stock_quantity
+                        ) > 0
+                    );
+                }
+            );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        availableMedicines = [];
+    }
+}
+
+
+/* =========================
+   SELECT OPTIONS
+   ========================= */
+
+function createMedicineOptions() {
+
+    let options =
+        '<option value="">Izvēlieties zāles</option>';
+
+
+    availableMedicines.forEach(
+        function (medicine) {
+
+            options += `
+                <option
+                    value="${medicine.id}"
+                    data-price="${medicine.price}"
+                    data-stock="${medicine.stock_quantity}"
+                >
+                    ${escapeHtml(
+                        medicine.name
+                    )} —
+                    ${formatPrice(
+                        medicine.price
+                    )}
+                    (noliktavā:
+                    ${medicine.stock_quantity})
+                </option>
+            `;
+        }
+    );
+
+
+    return options;
+}
+
+
+/* =========================
+   PIEVIENOT ZĀĻU RINDU
+   ========================= */
+
+function addCreateOrderItem() {
+
+    const row =
+        document.createElement('div');
+
+
+    row.className =
+        'form-grid create-order-item-row';
+
+
+    row.style.marginBottom =
+        '12px';
+
+
+    row.innerHTML = `
+
+        <div class="form-group">
+
+            <label>
+                Zāles *
+            </label>
+
+
+            <select
+                class="create-order-medicine"
+                required
+            >
+
+                ${createMedicineOptions()}
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Daudzums *
+            </label>
+
+
+            <div
+                style="
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                "
+            >
+
+                <input
+                    type="number"
+                    class="create-order-quantity"
+                    min="1"
+                    value="1"
+                    required
+                >
+
+
+                <button
+                    type="button"
+                    class="
+                        table-action-button
+                        delete-action-button
+                        remove-order-item-button
+                    "
+                    title="Dzēst"
+                >
+                    Dzēst
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    const select =
+        row.querySelector(
+            '.create-order-medicine'
+        );
+
+
+    const quantityInput =
+        row.querySelector(
+            '.create-order-quantity'
+        );
+
+
+    const removeButton =
+        row.querySelector(
+            '.remove-order-item-button'
+        );
+
+
+    select.addEventListener(
+        'change',
+        function () {
+
+            const option =
+                select.options[
+                    select.selectedIndex
+                ];
+
+
+            const stock =
+                Number(
+                    option?.dataset.stock
+                    ?? 0
+                );
+
+
+            if (stock > 0) {
+
+                quantityInput.max =
+                    stock;
+
+            } else {
+
+                quantityInput.removeAttribute(
+                    'max'
+                );
+            }
+
+
+            if (
+                stock > 0 &&
+                Number(
+                    quantityInput.value
+                ) > stock
+            ) {
+
+                quantityInput.value =
+                    stock;
+            }
+
+
+            updateCreateOrderTotal();
+        }
+    );
+
+
+    quantityInput.addEventListener(
+        'input',
+        updateCreateOrderTotal
+    );
+
+
+    removeButton.addEventListener(
+        'click',
+        function () {
+
+            if (
+                createOrderItems.children.length
+                <= 1
+            ) {
+
+                showCreateOrderMessage(
+                    'Pasūtījumā jābūt vismaz vienām zālēm.',
+                    'error'
+                );
+
+                return;
+            }
+
+
+            row.remove();
+
+
+            clearCreateOrderMessage();
+
+
+            updateCreateOrderTotal();
+        }
+    );
+
+
+    createOrderItems.appendChild(
+        row
+    );
+
+
+    updateCreateOrderTotal();
+}
+
+
+/* =========================
+   RESET ZĀĻU RINDAS
+   ========================= */
+
+function resetCreateOrderItems() {
+
+    createOrderItems.innerHTML =
+        '';
+
+
+    addCreateOrderItem();
+}
+
+
+/* =========================
+   SAVĀC VISAS ZĀLES
+   ========================= */
+
+function collectCreateOrderItems() {
+
+    const items = [];
+
+
+    createOrderItems
+        .querySelectorAll(
+            '.create-order-item-row'
+        )
+        .forEach(
+            function (row) {
+
+                const medicineId =
+                    Number(
+                        row.querySelector(
+                            '.create-order-medicine'
+                        ).value
+                    );
+
+
+                const quantity =
+                    Number(
+                        row.querySelector(
+                            '.create-order-quantity'
+                        ).value
+                    );
+
+
+                if (
+                    medicineId > 0 &&
+                    quantity > 0
+                ) {
+
+                    items.push({
+                        medicine_id:
+                            medicineId,
+
+                        quantity:
+                            quantity
+                    });
+                }
+            }
+        );
+
+
+    return items;
+}
+
+
+/* =========================
+   APRĒĶINA SUMMU
+   ========================= */
+
+function updateCreateOrderTotal() {
+
+    let total = 0;
+
+
+    createOrderItems
+        .querySelectorAll(
+            '.create-order-item-row'
+        )
+        .forEach(
+            function (row) {
+
+                const select =
+                    row.querySelector(
+                        '.create-order-medicine'
+                    );
+
+
+                const quantity =
+                    Number(
+                        row.querySelector(
+                            '.create-order-quantity'
+                        ).value
+                    ) || 0;
+
+
+                const option =
+                    select.options[
+                        select.selectedIndex
+                    ];
+
+
+                const price =
+                    Number(
+                        option?.dataset.price
+                        ?? 0
+                    );
+
+
+                total +=
+                    price * quantity;
+            }
+        );
+
+
+    createOrderTotal.textContent =
+        formatPrice(
+            total
+        );
+}
+
+
+/* =========================
+   + PIEVIENOT ZĀLES
+   ========================= */
+
+addOrderItemButton.addEventListener(
+    'click',
+    function () {
+
+        addCreateOrderItem();
+    }
+);
+
+
+/* =========================
+   ATVĒRT JAUNU PASŪTĪJUMU
+   ========================= */
+
+openCreateOrderModal.addEventListener(
+    'click',
+    function () {
+
+        createOrderForm.reset();
+
+
+        clearCreateOrderMessage();
+
+
+        resetCreateOrderItems();
+
+
+        createOrderModal.classList.add(
+            'active'
+        );
+
+
+        document.body.style.overflow =
+            'hidden';
+    }
+);
+
+
+/* =========================
+   AIZVĒRT CREATE MODAL
+   ========================= */
+
+function closeCreateModal() {
+
+    createOrderModal.classList.remove(
+        'active'
+    );
+
+
+    document.body.style.overflow =
+        '';
+
+
+    createOrderForm.reset();
+
+
+    createOrderItems.innerHTML =
+        '';
+
+
+    createOrderTotal.textContent =
+        formatPrice(
+            0
+        );
+
+
+    clearCreateOrderMessage();
+}
+
+
+closeCreateOrderModal.addEventListener(
+    'click',
+    closeCreateModal
+);
+
+
+cancelCreateOrderModal.addEventListener(
+    'click',
+    closeCreateModal
+);
+
+
+createOrderModal.addEventListener(
+    'click',
+    function (event) {
+
+        if (
+            event.target ===
+            createOrderModal
+        ) {
+
+            closeCreateModal();
+        }
+    }
+);
+
+
+/* =========================
+   CREATE PASŪTĪJUMS
+   ========================= */
+
+createOrderForm.addEventListener(
+    'submit',
+    async function (event) {
+
+        event.preventDefault();
+
+
+        const customerName =
+            document.getElementById(
+                'createCustomerName'
+            ).value.trim();
+
+
+        const customerEmail =
+            document.getElementById(
+                'createCustomerEmail'
+            ).value.trim();
+
+
+        const items =
+            collectCreateOrderItems();
+
+
+        if (items.length === 0) {
+
+            showCreateOrderMessage(
+                'Pievienojiet pasūtījumam vismaz vienas zāles.',
+                'error'
+            );
+
+            return;
+        }
+
+
+        const data = {
+
+            customer_name:
+                customerName,
+
+            customer_email:
+                customerEmail,
+
+            items:
+                items
+        };
+
+
+        try {
+
+            const response =
+                await fetch(
+                    '../api/orders.php',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body:
+                            JSON.stringify(
+                                data
+                            )
+                    }
+                );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                window.location.href =
+                    'login.php';
+
+                return;
+            }
+
+
+            const result =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !result.success
+            ) {
+
+                showCreateOrderMessage(
+                    result.message
+                    ??
+                    'Neizdevās pievienot pasūtījumu.',
+                    'error'
+                );
+
+                return;
+            }
+
+
+            showCreateOrderMessage(
+                result.message,
+                'success'
+            );
+
+
+            await loadOrders();
+
+
+            await loadOrderMedicines();
+
+
+            setTimeout(
+                closeCreateModal,
+                700
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            showCreateOrderMessage(
+                'Neizdevās sazināties ar serveri.',
+                'error'
+            );
+        }
+    }
+);
+
+
+/* =========================
+   CREATE MESSAGE
+   ========================= */
+
+function showCreateOrderMessage(
+    message,
+    type
+) {
+
+    createOrderFormMessage.textContent =
+        message;
+
+
+    createOrderFormMessage.className =
+        `form-message ${type}`;
+}
+
+
+function clearCreateOrderMessage() {
+
+    createOrderFormMessage.textContent =
+        '';
+
+
+    createOrderFormMessage.className =
+        'form-message';
+}
+
+
+/* =========================
    TABULA
    ========================= */
 
 function renderOrders(orders) {
 
-    orderTableBody.innerHTML = '';
+    orderTableBody.innerHTML =
+        '';
+
 
     orderCount.textContent =
         orders.length;
 
 
-    if (orders.length === 0) {
+    if (
+        orders.length === 0
+    ) {
 
         orderMessage.style.display =
             'block';
 
+
         orderMessage.textContent =
             'Pasūtījumi nav atrasti.';
+
 
         return;
     }
@@ -126,171 +844,176 @@ function renderOrders(orders) {
         'none';
 
 
-    orders.forEach(function (order) {
+    orders.forEach(
+        function (order) {
 
-        const row =
-            document.createElement('tr');
-
-
-        row.innerHTML = `
-
-            <td>
-                <strong>
-                    #${order.id}
-                </strong>
-            </td>
+            const row =
+                document.createElement(
+                    'tr'
+                );
 
 
-            <td>
+            row.innerHTML = `
 
-                <strong>
-                    ${escapeHtml(
-                        order.customer_name
-                        ?? 'Klients'
-                    )}
-                </strong>
-
-                <br>
-
-                <small>
-                    ${escapeHtml(
-                        order.customer_email
-                        ?? '-'
-                    )}
-                </small>
-
-            </td>
+                <td>
+                    <strong>
+                        #${order.id}
+                    </strong>
+                </td>
 
 
-            <td>
-                ${escapeHtml(
-                    order.medicines
-                    ?? '-'
-                )}
-            </td>
+                <td>
 
-
-            <td>
-                <strong>
-                    ${formatPrice(
-                        order.total
-                    )}
-                </strong>
-            </td>
-
-
-            <td>
-
-                <span
-                    class="
-                        order-badge
-                        ${getPaymentClass(
-                            order.payment_status
+                    <strong>
+                        ${escapeHtml(
+                            order.customer_name
+                            ?? 'Klients'
                         )}
-                    "
-                >
+                    </strong>
+
+                    <br>
+
+                    <small>
+                        ${escapeHtml(
+                            order.customer_email
+                            ?? '-'
+                        )}
+                    </small>
+
+                </td>
+
+
+                <td>
                     ${escapeHtml(
-                        order.payment_status
+                        order.medicines
                         ?? '-'
                     )}
-                </span>
-
-            </td>
+                </td>
 
 
-            <td>
+                <td>
 
-                <span
-                    class="
-                        order-badge
-                        ${getOrderStatusClass(
+                    <strong>
+                        ${formatPrice(
+                            order.total
+                        )}
+                    </strong>
+
+                </td>
+
+
+                <td>
+
+                    <span
+                        class="
+                            order-badge
+                            ${getPaymentClass(
+                                order.payment_status
+                            )}
+                        "
+                    >
+                        ${escapeHtml(
+                            order.payment_status
+                            ?? '-'
+                        )}
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span
+                        class="
+                            order-badge
+                            ${getOrderStatusClass(
+                                order.status
+                            )}
+                        "
+                    >
+                        ${escapeHtml(
                             order.status
                         )}
-                    "
-                >
-                    ${escapeHtml(
-                        order.status
+                    </span>
+
+                </td>
+
+
+                <td>
+                    ${formatDate(
+                        order.created_at
                     )}
-                </span>
-
-            </td>
+                </td>
 
 
-            <td>
-                ${formatDate(
-                    order.created_at
-                )}
-            </td>
+                <td>
+
+                    <div class="table-actions">
+
+                        <button
+                            type="button"
+                            class="
+                                table-action-button
+                                edit-order-button
+                            "
+                        >
+                            Skatīt
+                        </button>
 
 
-            <td>
+                        <button
+                            type="button"
+                            class="
+                                table-action-button
+                                delete-action-button
+                                delete-order-button
+                            "
+                        >
+                            Dzēst
+                        </button>
 
-                <div class="table-actions">
+                    </div>
 
-                    <button
-                        type="button"
-                        class="
-                            table-action-button
-                            edit-order-button
-                        "
-                    >
-                        Skatīt
-                    </button>
+                </td>
 
-
-                    <button
-                        type="button"
-                        class="
-                            table-action-button
-                            delete-action-button
-                            delete-order-button
-                        "
-                    >
-                        Dzēst
-                    </button>
-
-                </div>
-
-            </td>
-
-        `;
+            `;
 
 
-        orderTableBody.appendChild(
+            orderTableBody.appendChild(
+                row
+            );
+
+
             row
-        );
+                .querySelector(
+                    '.edit-order-button'
+                )
+                .addEventListener(
+                    'click',
+                    function () {
+
+                        openOrder(
+                            order.id
+                        );
+                    }
+                );
 
 
-        row
-            .querySelector(
-                '.edit-order-button'
-            )
-            .addEventListener(
-                'click',
-                function () {
+            row
+                .querySelector(
+                    '.delete-order-button'
+                )
+                .addEventListener(
+                    'click',
+                    function () {
 
-                    openOrder(
-                        order.id
-                    );
-                }
-            );
-
-
-        row
-            .querySelector(
-                '.delete-order-button'
-            )
-            .addEventListener(
-                'click',
-                function () {
-
-                    deleteOrder(
-                        order.id
-                    );
-                }
-            );
-
-    });
+                        deleteOrder(
+                            order.id
+                        );
+                    }
+                );
+        }
+    );
 }
 
 
@@ -322,7 +1045,8 @@ async function openOrder(id) {
 
             alert(
                 result.message
-                ?? 'Neizdevās ielādēt pasūtījumu.'
+                ??
+                'Neizdevās ielādēt pasūtījumu.'
             );
 
             return;
@@ -349,22 +1073,26 @@ async function openOrder(id) {
             'orderCustomerName'
         ).textContent =
             order.delivery_name
-            || order.customer_name
-            || '-';
+            ||
+            order.customer_name
+            ||
+            '-';
 
 
         document.getElementById(
             'orderCustomerEmail'
         ).textContent =
             order.customer_email
-            || '-';
+            ||
+            '-';
 
 
         document.getElementById(
             'orderPaymentStatus'
         ).textContent =
             order.payment_status
-            || '-';
+            ||
+            '-';
 
 
         document.getElementById(
@@ -387,17 +1115,21 @@ async function openOrder(id) {
             'orderStripeSession'
         ).textContent =
             order.stripe_session_id
-            || '-';
+            ||
+            '-';
 
 
         document.getElementById(
             'orderAddress'
         ).textContent =
-            buildAddress(order);
+            buildAddress(
+                order
+            );
 
 
         renderOrderItems(
-            result.items ?? []
+            result.items
+            ?? []
         );
 
 
@@ -434,10 +1166,13 @@ function renderOrderItems(items) {
         );
 
 
-    container.innerHTML = '';
+    container.innerHTML =
+        '';
 
 
-    if (items.length === 0) {
+    if (
+        items.length === 0
+    ) {
 
         container.innerHTML = `
             <p>
@@ -445,78 +1180,87 @@ function renderOrderItems(items) {
             </p>
         `;
 
+
         return;
     }
 
 
-    items.forEach(function (item) {
+    items.forEach(
+        function (item) {
 
-        const element =
-            document.createElement('div');
+            const element =
+                document.createElement(
+                    'div'
+                );
 
 
-        element.className =
-            'order-item-row';
+            element.className =
+                'order-item-row';
 
 
-        element.innerHTML = `
+            element.innerHTML = `
 
-            <div>
+                <div>
+
+                    <strong>
+                        ${escapeHtml(
+                            item.medicine_name
+                            ?? 'Zāles'
+                        )}
+                    </strong>
+
+
+                    ${
+                        item.prescription_number
+
+                            ? `
+                                <small>
+                                    Recepte:
+                                    ${escapeHtml(
+                                        item.prescription_number
+                                    )}
+                                </small>
+                            `
+
+                            : ''
+                    }
+
+                </div>
+
+
+                <span>
+
+                    ${item.quantity} ×
+
+                    ${formatPrice(
+                        item.unit_price
+                    )}
+
+                </span>
+
 
                 <strong>
-                    ${escapeHtml(
-                        item.medicine_name
-                        ?? 'Zāles'
+
+                    ${formatPrice(
+                        Number(
+                            item.unit_price
+                        )
+                        *
+                        Number(
+                            item.quantity
+                        )
                     )}
+
                 </strong>
 
-
-                ${
-                    item.prescription_number
-
-                        ? `
-                            <small>
-                                Recepte:
-                                ${escapeHtml(
-                                    item.prescription_number
-                                )}
-                            </small>
-                        `
-
-                        : ''
-                }
-
-            </div>
+            `;
 
 
-            <span>
-                ${item.quantity} ×
-                ${formatPrice(
-                    item.unit_price
-                )}
-            </span>
-
-
-            <strong>
-                ${formatPrice(
-                    Number(
-                        item.unit_price
-                    )
-                    *
-                    Number(
-                        item.quantity
-                    )
-                )}
-            </strong>
-
-        `;
-
-
-        container.appendChild(
-            element
-        );
-
-    });
+            container.appendChild(
+                element
+            );
+        }
+    );
 }
 
 
@@ -575,7 +1319,8 @@ orderForm.addEventListener(
 
                 showFormMessage(
                     result.message
-                    ?? 'Neizdevās saglabāt statusu.',
+                    ??
+                    'Neizdevās saglabāt statusu.',
                     'error'
                 );
 
@@ -608,7 +1353,6 @@ orderForm.addEventListener(
                 'error'
             );
         }
-
     }
 );
 
@@ -626,6 +1370,7 @@ async function deleteOrder(id) {
 
 
     if (!confirmed) {
+
         return;
     }
 
@@ -662,7 +1407,8 @@ async function deleteOrder(id) {
 
             alert(
                 result.message
-                ?? 'Neizdevās dzēst pasūtījumu.'
+                ??
+                'Neizdevās dzēst pasūtījumu.'
             );
 
             return;
@@ -735,13 +1481,30 @@ document.addEventListener(
     function (event) {
 
         if (
-            event.key === 'Escape' &&
+            event.key !== 'Escape'
+        ) {
+
+            return;
+        }
+
+
+        if (
             orderModal.classList.contains(
                 'active'
             )
         ) {
 
             closeModal();
+        }
+
+
+        if (
+            createOrderModal.classList.contains(
+                'active'
+            )
+        ) {
+
+            closeCreateModal();
         }
     }
 );
@@ -772,8 +1535,9 @@ function getOrderStatusClass(status) {
     };
 
 
-    return classes[status]
-        ?? '';
+    return classes[
+        status
+    ] ?? '';
 }
 
 
@@ -792,8 +1556,9 @@ function getPaymentClass(status) {
     };
 
 
-    return classes[status]
-        ?? '';
+    return classes[
+        status
+    ] ?? '';
 }
 
 
@@ -806,7 +1571,9 @@ function buildAddress(order) {
     const parts = [];
 
 
-    if (order.delivery_address) {
+    if (
+        order.delivery_address
+    ) {
 
         parts.push(
             order.delivery_address
@@ -814,7 +1581,9 @@ function buildAddress(order) {
     }
 
 
-    if (order.delivery_city) {
+    if (
+        order.delivery_city
+    ) {
 
         parts.push(
             order.delivery_city
@@ -822,7 +1591,9 @@ function buildAddress(order) {
     }
 
 
-    if (order.delivery_postal_code) {
+    if (
+        order.delivery_postal_code
+    ) {
 
         parts.push(
             order.delivery_postal_code
@@ -830,7 +1601,9 @@ function buildAddress(order) {
     }
 
 
-    if (order.delivery_country) {
+    if (
+        order.delivery_country
+    ) {
 
         parts.push(
             order.delivery_country
@@ -849,11 +1622,16 @@ function formatPrice(value) {
     return new Intl.NumberFormat(
         'lv-LV',
         {
-            style: 'currency',
-            currency: 'EUR'
+            style:
+                'currency',
+
+            currency:
+                'EUR'
         }
     ).format(
-        Number(value)
+        Number(
+            value
+        )
     );
 }
 
@@ -861,6 +1639,7 @@ function formatPrice(value) {
 function formatDate(value) {
 
     if (!value) {
+
         return '-';
     }
 
@@ -908,11 +1687,14 @@ function clearFormMessage() {
 function escapeHtml(value) {
 
     const element =
-        document.createElement('div');
+        document.createElement(
+            'div'
+        );
 
 
     element.textContent =
-        value ?? '';
+        value
+        ?? '';
 
 
     return element.innerHTML;

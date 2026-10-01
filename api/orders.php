@@ -236,6 +236,390 @@ if ($method === 'GET') {
 
 
 /* =========================================================
+   POST - JAUNS MANUĀLS PASŪTĪJUMS
+   ========================================================= */
+
+if ($method === 'POST') {
+
+    $data = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
+
+
+    if (!is_array($data)) {
+
+        jsonResponse([
+            'success' => false,
+            'message' => 'Nederīgi nosūtītie dati.'
+        ], 400);
+    }
+
+
+    $customerName =
+        trim(
+            $data['customer_name']
+            ?? ''
+        );
+
+
+    $customerEmail =
+        trim(
+            $data['customer_email']
+            ?? ''
+        );
+
+
+    $items =
+        $data['items']
+        ?? [];
+
+
+    if (
+        $customerName === '' ||
+        !is_array($items) ||
+        count($items) === 0
+    ) {
+
+        jsonResponse([
+            'success' => false,
+            'message' => 'Norādiet klientu un pievienojiet vismaz vienas zāles.'
+        ], 422);
+    }
+
+
+    if (
+        $customerEmail !== '' &&
+        !filter_var(
+            $customerEmail,
+            FILTER_VALIDATE_EMAIL
+        )
+    ) {
+
+        jsonResponse([
+            'success' => false,
+            'message' => 'Norādiet korektu e-pasta adresi.'
+        ], 422);
+    }
+
+
+    /*
+     * Ja vienas un tās pašas zāles formā
+     * pievienotas vairākas reizes,
+     * apvienojam daudzumu vienā pozīcijā.
+     */
+
+    $mergedItems = [];
+
+
+    foreach ($items as $item) {
+
+        if (!is_array($item)) {
+            continue;
+        }
+
+
+        $medicineId =
+            (int) (
+                $item['medicine_id']
+                ?? 0
+            );
+
+
+        $quantity =
+            (int) (
+                $item['quantity']
+                ?? 0
+            );
+
+
+        if (
+            $medicineId <= 0 ||
+            $quantity <= 0
+        ) {
+
+            jsonResponse([
+                'success' => false,
+                'message' => 'Nederīgi zāļu dati pasūtījumā.'
+            ], 422);
+        }
+
+
+        if (!isset($mergedItems[$medicineId])) {
+            $mergedItems[$medicineId] = 0;
+        }
+
+
+        $mergedItems[$medicineId] +=
+            $quantity;
+    }
+
+
+    if (!$mergedItems) {
+
+        jsonResponse([
+            'success' => false,
+            'message' => 'Pasūtījumā nav zāļu.'
+        ], 422);
+    }
+
+
+    try {
+
+        $pdo->beginTransaction();
+
+
+        $medicineStmt = $pdo->prepare(
+            'SELECT
+                id,
+                name,
+                price,
+                stock_quantity,
+                prescription_required
+
+             FROM medicines
+
+             WHERE id = ?
+             AND deleted_at IS NULL
+
+             LIMIT 1
+             FOR UPDATE'
+        );
+
+
+        $validatedItems = [];
+
+        $total = 0.0;
+
+        $auditMedicineNames = [];
+
+
+        foreach (
+            $mergedItems
+            as $medicineId => $quantity
+        ) {
+
+            $medicineStmt->execute([
+                $medicineId
+            ]);
+
+
+            $medicine =
+                $medicineStmt->fetch();
+
+
+            if (!$medicine) {
+
+                throw new RuntimeException(
+                    'Viena no izvēlētajām zālēm nav atrasta.'
+                );
+            }
+
+
+            if (
+                (int) $medicine[
+                    'prescription_required'
+                ] === 1
+            ) {
+
+                throw new RuntimeException(
+                    'Recepšu zāles manuālam pirkumam šajā formā nav pieejamas.'
+                );
+            }
+
+
+            if (
+                (int) $medicine[
+                    'stock_quantity'
+                ] < $quantity
+            ) {
+
+                throw new RuntimeException(
+                    'Noliktavā nav pietiekams daudzums zālēm: ' .
+                    $medicine['name'] . '.'
+                );
+            }
+
+
+            $unitPrice =
+                (float) $medicine['price'];
+
+
+            $total +=
+                $unitPrice * $quantity;
+
+
+            $validatedItems[] = [
+                'medicine_id' =>
+                    (int) $medicine['id'],
+
+                'quantity' =>
+                    $quantity,
+
+                'unit_price' =>
+                    $unitPrice
+            ];
+
+
+            $auditMedicineNames[] =
+                $medicine['name'] .
+                ' × ' .
+                $quantity;
+        }
+
+
+        $total =
+            round(
+                $total,
+                2
+            );
+
+
+        /*
+         * Manuāls pasūtījums nozīmē,
+         * ka pirkums jau ir veikts aptiekā.
+         */
+
+        $orderStmt = $pdo->prepare(
+            "INSERT INTO orders
+                (
+                    customer_name,
+                    customer_email,
+                    status,
+                    payment_status,
+                    total
+                )
+             VALUES (?, ?, 'Izsniegts', 'Apmaksāts', ?)"
+        );
+
+
+        $orderStmt->execute([
+            $customerName,
+            $customerEmail !== ''
+                ? $customerEmail
+                : null,
+            $total
+        ]);
+
+
+        $orderId =
+            (int) $pdo->lastInsertId();
+
+
+        $itemStmt = $pdo->prepare(
+            'INSERT INTO order_items
+                (
+                    order_id,
+                    medicine_id,
+                    prescription_id,
+                    quantity,
+                    unit_price
+                )
+             VALUES (?, ?, NULL, ?, ?)'
+        );
+
+
+        $stockStmt = $pdo->prepare(
+            'UPDATE medicines
+
+             SET stock_quantity =
+                 stock_quantity - ?
+
+             WHERE id = ?
+             AND stock_quantity >= ?'
+        );
+
+
+        foreach ($validatedItems as $item) {
+
+            $itemStmt->execute([
+                $orderId,
+                $item['medicine_id'],
+                $item['quantity'],
+                $item['unit_price']
+            ]);
+
+
+            $stockStmt->execute([
+                $item['quantity'],
+                $item['medicine_id'],
+                $item['quantity']
+            ]);
+
+
+            if ($stockStmt->rowCount() !== 1) {
+
+                throw new RuntimeException(
+                    'Neizdevās atjaunināt zāļu atlikumu noliktavā.'
+                );
+            }
+        }
+
+
+        $pdo->commit();
+
+
+        logAction(
+            $pdo,
+            'CREATE',
+            'order',
+            $orderId,
+            'Izveidots un apmaksāts pirkums aptiekā #' .
+            $orderId .
+            ', klients: ' .
+            $customerName .
+            ', zāles: ' .
+            implode(
+                ', ',
+                $auditMedicineNames
+            ) .
+            ', summa: ' .
+            number_format(
+                $total,
+                2,
+                '.',
+                ''
+            ) .
+            ' EUR'
+        );
+
+
+        jsonResponse([
+            'success' => true,
+            'message' => 'Pirkums veiksmīgi pievienots un atzīmēts kā apmaksāts.',
+            'id' => $orderId
+        ], 201);
+
+
+    } catch (RuntimeException $e) {
+
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+
+        jsonResponse([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 422);
+
+
+    } catch (PDOException $e) {
+
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+
+        jsonResponse([
+            'success' => false,
+            'message' => 'Neizdevās pievienot pasūtījumu.'
+        ], 500);
+    }
+}
+
+
+/* =========================================================
    PUT - STATUSA MAIŅA
    ========================================================= */
 

@@ -64,6 +64,14 @@ const apiSearchName =
 const prescriptionRequired =
     document.getElementById('prescriptionRequired');
 
+const medicineImage =
+    document.getElementById('medicineImage');
+
+const medicineImagePreview =
+    document.getElementById('medicineImagePreview');
+
+let selectedImagePreviewUrl = null;
+
 
 loadMedicines();
 
@@ -350,13 +358,13 @@ openMedicineModal.addEventListener(
 
 
         clearFormMessage();
-
+        
+        resetImagePreview();
 
         medicineModal.classList.add(
             'active'
         );
-
-
+        
         document.body.style.overflow =
             'hidden';
     }
@@ -454,6 +462,10 @@ async function openEditMedicine(id) {
                 ? '1'
                 : '0';
 
+        showStoredImagePreview(
+            medicine.image ?? ''
+        );
+
 
         medicineModalTitle.textContent =
             'Rediģēt zāles';
@@ -506,6 +518,7 @@ function closeModal() {
     medicineModalTitle.textContent =
         'Pievienot zāles';
 
+    resetImagePreview();
 
     clearFormMessage();
 }
@@ -576,6 +589,8 @@ medicineForm.addEventListener(
             Object.fromEntries(
                 formData.entries()
             );
+
+        delete data.image;
 
 
         data.category_id =
@@ -662,6 +677,34 @@ medicineForm.addEventListener(
                 return;
             }
 
+            const savedMedicineId =
+    Number(
+        result.id
+        ?? medicineId.value
+    );
+
+
+            if (medicineImage.files.length > 0) {
+
+                const uploadResult =
+                    await uploadMedicineImage(
+                        savedMedicineId
+                    );
+
+
+                if (!uploadResult.success) {
+
+                    showFormMessage(
+                        'Zāļu dati saglabāti, bet attēlu neizdevās augšupielādēt: ' +
+                        uploadResult.message,
+                        'error'
+                    );
+
+                    await loadMedicines();
+
+                    return;
+                }
+            }
 
             showFormMessage(
                 result.message,
@@ -690,6 +733,236 @@ medicineForm.addEventListener(
         }
     }
 );
+
+/* =========================
+   ATTĒLA PRIEKŠSKATĪJUMS
+   ========================= */
+
+medicineImage.addEventListener(
+    'change',
+    function () {
+
+        const file =
+            medicineImage.files[0];
+
+
+        if (!file) {
+
+            resetImagePreview();
+
+            return;
+        }
+
+
+        const allowedTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/webp'
+        ];
+
+
+        if (!allowedTypes.includes(file.type)) {
+
+            medicineImage.value = '';
+
+            showFormMessage(
+                'Atļauti tikai JPG, PNG un WEBP attēli.',
+                'error'
+            );
+
+            resetImagePreview();
+
+            return;
+        }
+
+
+        if (file.size > 2 * 1024 * 1024) {
+
+            medicineImage.value = '';
+
+            showFormMessage(
+                'Attēls ir pārāk liels. Maksimālais izmērs ir 2 MB.',
+                'error'
+            );
+
+            resetImagePreview();
+
+            return;
+        }
+
+
+        clearFormMessage();
+
+
+        if (selectedImagePreviewUrl) {
+
+            URL.revokeObjectURL(
+                selectedImagePreviewUrl
+            );
+        }
+
+
+        selectedImagePreviewUrl =
+            URL.createObjectURL(file);
+
+
+        medicineImagePreview.innerHTML = `
+            <img
+                src="${selectedImagePreviewUrl}"
+                alt="Zāļu attēla priekšskatījums"
+            >
+        `;
+    }
+);
+
+
+function showStoredImagePreview(imagePath) {
+
+    resetImagePreview();
+
+
+    if (!imagePath) {
+
+        return;
+    }
+
+
+    const image =
+        document.createElement('img');
+
+
+    image.src =
+        '../' + imagePath;
+
+    image.alt =
+        'Esošais zāļu attēls';
+
+
+    medicineImagePreview.innerHTML = '';
+
+    medicineImagePreview.appendChild(
+        image
+    );
+}
+
+
+function resetImagePreview() {
+
+    if (selectedImagePreviewUrl) {
+
+        URL.revokeObjectURL(
+            selectedImagePreviewUrl
+        );
+
+        selectedImagePreviewUrl = null;
+    }
+
+
+    medicineImagePreview.innerHTML =
+        '<span>Attēls nav izvēlēts</span>';
+}
+
+
+/* =========================
+   ATTĒLA AUGŠUPIELĀDE
+   ========================= */
+
+async function uploadMedicineImage(id) {
+
+    if (!id) {
+
+        return {
+            success: false,
+            message: 'Nav norādīts zāļu ID.'
+        };
+    }
+
+
+    const file =
+        medicineImage.files[0];
+
+
+    if (!file) {
+
+        return {
+            success: true
+        };
+    }
+
+
+    const uploadData =
+        new FormData();
+
+
+    uploadData.append(
+        'medicine_id',
+        id
+    );
+
+
+    uploadData.append(
+        'image',
+        file
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                '../api/medicine-image.php',
+                {
+                    method: 'POST',
+                    body: uploadData
+                }
+            );
+
+
+        if (response.status === 401) {
+
+            window.location.href =
+                'login.php';
+
+
+            return {
+                success: false,
+                message: 'Nav autorizācijas.'
+            };
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            return {
+                success: false,
+                message:
+                    result.message
+                    ?? 'Neizdevās augšupielādēt attēlu.'
+            };
+        }
+
+
+        return result;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        return {
+            success: false,
+            message: 'Neizdevās sazināties ar serveri.'
+        };
+    }
+}
 
 
 /* =========================

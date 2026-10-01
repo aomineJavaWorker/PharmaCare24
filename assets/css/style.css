@@ -326,6 +326,15 @@ body {
     font-size: 55px;
 }
 
+.medicine-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+
 .medicine-category {
     margin-bottom: 8px;
     color: var(--primary);

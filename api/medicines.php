@@ -66,7 +66,8 @@ if ($method === 'GET') {
                     price,
                     stock_quantity,
                     prescription_required,
-                    api_search_name
+                    api_search_name,
+                    image
                  FROM medicines
                  WHERE id = ?
                  AND deleted_at IS NULL
@@ -126,6 +127,7 @@ if ($method === 'GET') {
                 medicines.stock_quantity,
                 medicines.prescription_required,
                 medicines.api_search_name,
+                medicines.image,
                 categories.name AS category_name
 
              FROM medicines
@@ -325,7 +327,8 @@ if ($method === 'POST') {
 
         jsonResponse([
             'success' => true,
-            'message' => 'Zāles veiksmīgi pievienotas.'
+            'message' => 'Zāles veiksmīgi pievienotas.',
+            'id' => $medicineId
         ], 201);
 
 
@@ -519,7 +522,8 @@ if ($method === 'PUT') {
 
         jsonResponse([
             'success' => true,
-            'message' => 'Zāles veiksmīgi rediģētas.'
+            'message' => 'Zāles veiksmīgi rediģētas.',
+            'id' => $id
         ]);
 
 

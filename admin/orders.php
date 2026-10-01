@@ -19,6 +19,15 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
     </div>
 
+
+    <button
+        type="button"
+        id="openCreateOrderModal"
+        class="primary-admin-button"
+    >
+        + Pievienot pasūtījumu
+    </button>
+
 </div>
 
 
@@ -90,6 +99,142 @@ require_once __DIR__ . '/../includes/admin_header.php';
     </div>
 
 </section>
+
+
+<!-- JAUNA PASŪTĪJUMA MODĀLAIS LOGS -->
+
+<div id="createOrderModal" class="admin-modal">
+    <div class="admin-modal-content">
+
+        <div class="admin-modal-header">
+            <div>
+                <h2>Pievienot pasūtījumu</h2>
+                <p>Izveidojiet pasūtījumu, kas noformēts uz vietas aptiekā.</p>
+            </div>
+
+            <button
+                type="button"
+                id="closeCreateOrderModal"
+                class="admin-modal-close"
+                aria-label="Aizvērt"
+            >
+                ×
+            </button>
+        </div>
+
+        <div
+            id="createOrderFormMessage"
+            class="form-message"
+        ></div>
+
+        <form id="createOrderForm">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="createCustomerName">
+                        Klienta vārds un uzvārds *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="createCustomerName"
+                        name="customer_name"
+                        maxlength="150"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="createCustomerEmail">
+                        E-pasts
+                    </label>
+
+                    <input
+                        type="email"
+                        id="createCustomerEmail"
+                        name="customer_email"
+                        maxlength="150"
+                        placeholder="nav obligāts"
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="order-section" style="margin-top: 22px;">
+
+                <div
+                    class="admin-panel-header"
+                    style="margin-bottom: 12px;"
+                >
+                    <div>
+                        <h3>Pasūtījuma zāles</h3>
+
+                        <p>
+                            Var pievienot vairākas dažādas zāles.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="addOrderItemButton"
+                        class="secondary-button"
+                    >
+                        + Pievienot zāles
+                    </button>
+                </div>
+
+
+                <div id="createOrderItems"></div>
+
+            </div>
+
+
+            <div
+                class="order-detail"
+                style="margin-top: 18px;"
+            >
+                <span>Kopējā summa</span>
+
+                <strong id="createOrderTotal">
+                    0,00 €
+                </strong>
+            </div>
+
+
+            <p style="margin-top:16px;color:#758078;font-size:13px;line-height:1.5;">
+                Šis pasūtījums tiek noformēts uz vietas aptiekā,
+                tāpēc tas uzreiz tiek saglabāts kā
+                <strong>Apmaksāts</strong> un
+                <strong>Izsniegts</strong>.
+                Recepšu zāles šajā formā netiek piedāvātas.
+            </p>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelCreateOrderModal"
+                    class="secondary-button"
+                >
+                    Atcelt
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-admin-button"
+                >
+                    Pievienot pasūtījumu
+                </button>
+
+            </div>
+
+        </form>
+    </div>
+</div>
 
 
 <!-- PASŪTĪJUMA MODĀLAIS LOGS -->

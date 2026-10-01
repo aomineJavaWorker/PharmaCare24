@@ -66,7 +66,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
             </button>
         </div>
 
-        <form id="medicineForm">
+        <form id="medicineForm" enctype="multipart/form-data">
 
             <input
                 type="hidden"
@@ -188,6 +188,21 @@ require_once __DIR__ . '/../includes/admin_header.php';
                     </select>
                 </div>
 
+
+                <div class="form-group form-group-full">
+                    <label for="medicineImage">Zāļu attēls</label>
+                    <input
+                        type="file"
+                        id="medicineImage"
+                        name="image"
+                        accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                    >
+                    <small class="form-help">JPG, PNG vai WEBP. Maksimālais faila izmērs: 2 MB.</small>
+
+                    <div id="medicineImagePreview" class="medicine-image-preview">
+                        <span>Attēls nav izvēlēts</span>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-actions">

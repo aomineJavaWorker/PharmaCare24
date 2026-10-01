@@ -26,6 +26,8 @@ $stmt = $pdo->query(
 
         medicines.prescription_required,
 
+        medicines.image,
+
         categories.name AS category_name
 
      FROM medicines
@@ -451,11 +453,29 @@ $medicines = $stmt->fetchAll();
 
                         <div class="medicine-image">
 
-                            <span class="medicine-icon">
+                            <?php if (!empty($medicine['image'])): ?>
 
-                                +
+                                <img
+                                    src="<?= htmlspecialchars(
+                                        $medicine['image'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>"
+                                    alt="<?= htmlspecialchars(
+                                        $medicine['name'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>"
+                                    loading="lazy"
+                                >
 
-                            </span>
+                            <?php else: ?>
+
+                                <span class="medicine-icon">
+                                    +
+                                </span>
+
+                            <?php endif; ?>
 
                         </div>
 
