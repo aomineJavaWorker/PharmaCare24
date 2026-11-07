@@ -78,7 +78,7 @@ Nepieciešams PHP ar PDO MySQL atbalstu, MySQL, Composer un lokāls PHP tīmekļ
 
 1. Klonējiet repozitoriju:
    ```bash
-   git clone https://github.com/aomineJavaWorker/Aptieka.git
+   git clone https://github.com/aomineJavaWorker/PharmaCare24.git
    cd PharmaCare24
    ```
 2. Instalējiet atkarības:
