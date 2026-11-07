@@ -1,4 +1,4 @@
-# Aptieka | PharmaCare24
+# PharmaCare24
 
 Mācību projekts: aptiekas tīmekļa vietne ar zāļu katalogu, pasūtījumu noformēšanu un administrācijas paneli. Projekts izstrādāts ar PHP, MySQL, HTML, CSS un JavaScript.
 
@@ -79,7 +79,7 @@ Nepieciešams PHP ar PDO MySQL atbalstu, MySQL, Composer un lokāls PHP tīmekļ
 1. Klonējiet repozitoriju:
    ```bash
    git clone https://github.com/aomineJavaWorker/Aptieka.git
-   cd Aptieka
+   cd PharmaCare24
    ```
 2. Instalējiet atkarības:
    ```bash
