@@ -10,20 +10,24 @@ Mācību projekts: aptiekas tīmekļa vietne ar zāļu katalogu, pasūtījumu no
 ## Vietnes izmantošana
 
 1. Atveriet [PharmaCare24](https://pharmacare24.free.je/).
-   <img width="1875" height="943" alt="image" src="https://github.com/user-attachments/assets/d1b01a8d-4faf-45d4-bc0c-e4904cd59806" />
+
+   <img src="https://github.com/user-attachments/assets/d1b01a8d-4faf-45d4-bc0c-e4904cd59806" alt="Sākumlapa" width="760" />
 
 2. Sadaļā **Zāles** apskatiet katalogu. Zāles var meklēt un pārlūkot, izmantojot saraksta meklēšanas un lapošanas iespējas.
-   <img width="1242" height="936" alt="image" src="https://github.com/user-attachments/assets/b8467775-b2a5-4b80-87bd-f0811c0bc715" />
+
+   <img src="https://github.com/user-attachments/assets/b8467775-b2a5-4b80-87bd-f0811c0bc715" alt="Zāļu katalogs" width="620" />
 
 3. Nospiediet **Vairāk informācijas**, lai apskatītu papildu informāciju par vielu no **PubChem API**, ja tā ir pieejama.
-     
-5. Pievienojiet izvēlētās zāles grozam, pārbaudiet daudzumu un kopējo cenu.
-   <img width="700" height="740" alt="image" src="https://github.com/user-attachments/assets/e3d454d3-ca12-45bc-b382-72bc9f5b4d3f" />
 
-6. Ja grozā ir recepšu zāles, pirms apmaksas jāveic receptes pārbaude, ievadot pacienta datus.
-   <img width="526" height="595" alt="image" src="https://github.com/user-attachments/assets/c0f8c724-ea98-4880-9f95-91943690f5c6" />
+4. Pievienojiet izvēlētās zāles grozam, pārbaudiet daudzumu un kopējo cenu.
 
-8. Turpiniet uz **Stripe Checkout**, ja maksājumu integrācija ir konfigurēta testēšanai.
+   <img src="https://github.com/user-attachments/assets/e3d454d3-ca12-45bc-b382-72bc9f5b4d3f" alt="Pirkumu grozs" width="440" />
+
+5. Ja grozā ir recepšu zāles, pirms apmaksas jāveic receptes pārbaude, ievadot pacienta datus.
+
+   <img src="https://github.com/user-attachments/assets/c0f8c724-ea98-4880-9f95-91943690f5c6" alt="Recepšu pārbaude" width="390" />
+
+6. Turpiniet uz **Stripe Checkout**, ja maksājumu integrācija ir konfigurēta testēšanai.
 
 Vietnē pieejama arī tumšā un gaišā tēma, adaptīvs dizains un kontaktinformācijas sadaļa.
 
@@ -34,7 +38,9 @@ Vietnē pieejama arī tumšā un gaišā tēma, adaptīvs dizains un kontaktinfo
 1. Atveriet administrācijas paneļa saiti.
 2. Ievadiet administratora vai moderatora lietotājvārdu un paroli.
 3. Pēc veiksmīgas autorizācijas atvērsies **Kopsavilkuma panelis**.
-<img width="1912" height="696" alt="image" src="https://github.com/user-attachments/assets/a6a8e304-0a28-4e24-8dca-b8e791d8398f" />
+
+   <img src="https://github.com/user-attachments/assets/a6a8e304-0a28-4e24-8dca-b8e791d8398f" alt="Administrācijas kopsavilkuma panelis" width="760" />
+
 4. Lai beigtu darbu, augšējā joslā nospiediet izrakstīšanās pogu.
 
 Piekļuve ir paredzēta tikai autorizētiem lietotājiem. Drošības dēļ administratora piekļuves dati nav publicēti README. Demonstrācijas piekļuvi var saskaņot ar projekta autoru.
