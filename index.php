@@ -219,7 +219,7 @@ $medicines = $stmt->fetchAll();
 
                 <h1>
 
-                    Jūsu veselība —
+                    Jūsu veselība ir
 
                     mūsu prioritāte
 
