@@ -141,9 +141,9 @@ if (count($featuredMedicines) < 4) {
 
             </a>
 
-            <a href="#pakalpojumi">
+            <a href="#izlase">
 
-                Pakalpojumi
+                Izlase
 
             </a>
 
@@ -229,100 +229,97 @@ if (count($featuredMedicines) < 4) {
 <main>
 
     <!-- SĀKUMS -->
-
-    <section
-
-        id="sakums"
-
-        class="hero"
-
-    >
-
+    <section id="sakums" class="hero home-hero">
         <div class="container hero-content">
-
             <div class="hero-text">
-
-                <span class="section-label">
-
-                    Jūsu veselībai
-
-                </span>
-
-                <h1>
-
-                    Jūsu veselība ir
-
-                    mūsu prioritāte
-
-                </h1>
-
-                <p>
-
-                    Kvalitatīvi medikamenti, pārskatāma
-
-                    informācija un rūpes par jūsu veselību
-
-                    vienuviet.
-
+                <span class="home-eyebrow"><span class="home-eyebrow-dot" aria-hidden="true"></span> PHARMACARE24 · MĀCĪBU PROJEKTS</span>
+                <h1>Vienkāršāks ceļš uz <span>skaidru informāciju.</span></h1>
+                <p class="home-hero-description">
+                    Atrodiet medikamentus demonstrācijas katalogā, salīdziniet cenas
+                    un apskatiet produktu informāciju vienuviet.
                 </p>
-
-                <a
-
-                    href="#zales"
-
-                    class="primary-button"
-
-                >
-
-                    Apskatīt zāles
-
-                </a>
-
+                <div class="home-hero-actions">
+                    <a href="#zales" class="primary-button home-hero-primary">Atvērt katalogu <span aria-hidden="true">↗</span></a>
+                    <a href="#izlase" class="home-hero-secondary">Apskatīt izlasi <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="home-hero-highlights" aria-label="Kataloga iespējas">
+                    <span><span aria-hidden="true">✓</span> Pārskatāmi filtri</span>
+                    <span><span aria-hidden="true">✓</span> Produktu detaļas</span>
+                    <span><span aria-hidden="true">✓</span> Gaišā un tumšā tēma</span>
+                </div>
             </div>
-
-            <div class="hero-card hero-photo-card">
-
-                <img
-                    src="assets/img/pharmacy-hero.png"
-                    alt="Mūsdienīga aptieka un medikamenti"
-                    class="hero-photo"
-                >
-
+            <div class="home-hero-visual">
+                <div class="home-hero-image-wrap">
+                    <img src="assets/img/pharmacy-hero.png"
+                         alt="PharmaCare24 demonstrācijas aptiekas ilustrācija"
+                         class="home-hero-image" fetchpriority="high">
+                </div>
+                <div class="home-hero-floating-card">
+                    <span class="home-floating-icon" aria-hidden="true">✚</span>
+                    <div>
+                        <strong>Viss vienā katalogā</strong>
+                        <small>Meklēšana · Cenas · Pieejamība</small>
+                    </div>
+                </div>
+                <span class="home-hero-image-tag">Digitālas aptiekas demonstrācija</span>
             </div>
-
         </div>
-
     </section>
 
-        <!-- PRODUKTU IZLASE -->
-    <section id="izlase" class="section featured-section">
+    <!-- PRODUKTU IZLASE -->
+    <section id="izlase" class="section featured-section" aria-labelledby="featuredHeading">
         <div class="container">
             <div class="featured-intro">
                 <div>
-                    <span class="section-label">Kataloga izlase</span>
-                    <h2 class="section-title">Iepazīstiet mūsu produktus</h2>
-                    <p>Daži produkti no demonstrācijas kataloga. Atveriet kartīti, lai uzzinātu vairāk.</p>
+                    <span class="section-label">Populāru produktu izlase</span>
+                    <h2 id="featuredHeading" class="section-title">Iepazīstiet pazīstamus produktus</h2>
+                    <p>Atlasīti piemēri no demonstrācijas kataloga — nevis reālas pārdošanas statistikas tops.</p>
                 </div>
-                <a class="featured-all-link" href="#zales">Skatīt visu katalogu →</a>
+                <a class="featured-all-link" href="#zales">Viss katalogs <span aria-hidden="true">↗</span></a>
             </div>
-            <div class="featured-grid">
-                <?php foreach ($featuredMedicines as $featured): ?>
-                    <article class="featured-card">
-                        <a class="featured-card-image" href="medicine.php?id=<?= (int) $featured['id'] ?>" aria-label="Skatīt <?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?>">
-                            <?php if (!empty($featured['image'])): ?>
-                                <img src="<?= htmlspecialchars($featured['image'], ENT_QUOTES, 'UTF-8') ?>"
-                                     alt="<?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?> iepakojums" loading="lazy">
-                            <?php else: ?>
-                                <span class="featured-placeholder">+</span>
-                            <?php endif; ?>
-                        </a>
-                        <span class="featured-category"><?= htmlspecialchars($featured['category_name'] ?? 'Bez kategorijas', ENT_QUOTES, 'UTF-8') ?></span>
-                        <h3 class="featured-title"><a href="medicine.php?id=<?= (int) $featured['id'] ?>"><?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?></a></h3>
-                        <span class="featured-price"><?= number_format((float) $featured['price'], 2, ',', ' ') ?> €</span>
-                        <a class="featured-detail-link" href="medicine.php?id=<?= (int) $featured['id'] ?>">Skatīt produktu</a>
-                    </article>
-                <?php endforeach; ?>
-            </div>
+
+            <?php if (!empty($featuredMedicines)): ?>
+                <div class="featured-grid">
+                    <?php foreach ($featuredMedicines as $featured): ?>
+                        <article class="featured-card">
+                            <a class="featured-card-image"
+                               href="medicine.php?id=<?= (int) $featured['id'] ?>"
+                               aria-label="Skatīt <?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?>">
+                                <?php if (!empty($featured['image'])): ?>
+                                    <img src="<?= htmlspecialchars($featured['image'], ENT_QUOTES, 'UTF-8') ?>"
+                                         alt="<?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?> iepakojums"
+                                         loading="lazy">
+                                <?php else: ?>
+                                    <span class="featured-placeholder" aria-hidden="true">✚</span>
+                                <?php endif; ?>
+                            </a>
+                            <div class="featured-card-copy">
+                                <span class="featured-category"><?= htmlspecialchars($featured['category_name'] ?? 'Bez kategorijas', ENT_QUOTES, 'UTF-8') ?></span>
+                                <h3 class="featured-title">
+                                    <a href="medicine.php?id=<?= (int) $featured['id'] ?>">
+                                        <?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?>
+                                    </a>
+                                </h3>
+                                <p class="featured-substance">
+                                    <?= htmlspecialchars($featured['active_substance'] ?? 'Informācija pieejama produkta lapā', ENT_QUOTES, 'UTF-8') ?>
+                                </p>
+                            </div>
+                            <div class="featured-bottom">
+                                <div>
+                                    <span class="featured-price-label">Cena</span>
+                                    <strong class="featured-price"><?= number_format((float) $featured['price'], 2, ',', ' ') ?> €</strong>
+                                </div>
+                                <a class="featured-detail-link" href="medicine.php?id=<?= (int) $featured['id'] ?>"
+                                   aria-label="Skatīt <?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?> detaļas">
+                                    Skatīt <span aria-hidden="true">↗</span>
+                                </a>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p class="featured-empty">Pašlaik nav pieejamu produktu izlasei. <a href="#zales">Atvērt visu katalogu</a></p>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -346,17 +343,17 @@ if (count($featuredMedicines) < 4) {
 
             <h2 class="section-title">
 
-                Aptieka, kurai var uzticēties
+                Mācību projekts ar īstas lietotnes iespējām
 
             </h2>
 
             <p class="section-description">
 
-                Mūsu mērķis ir nodrošināt klientiem
+                PharmaCare24 demonstrē, kā darbojas aptiekas tīmekļa lietotne:
 
-                ērtu piekļuvi medikamentiem un
+                pārskatāms katalogs, produkta informācija un pasūtījumu plūsma.
 
-                noderīgai informācijai par veselību.
+                Vietne izveidota programmēšanas iemaņu demonstrēšanai.
 
             </p>
 
@@ -384,7 +381,7 @@ if (count($featuredMedicines) < 4) {
 
             <h2 class="section-title">
 
-                Ko mēs piedāvājam?
+                Ko var izmēģināt šajā vietnē?
 
             </h2>
 
@@ -400,17 +397,15 @@ if (count($featuredMedicines) < 4) {
 
                     <h3>
 
-                        Plašs sortiments
+                        Produktu katalogs
 
                     </h3>
 
                     <p>
 
-                        Recepšu un bezrecepšu zāles,
+                        Meklēšana, kategoriju un cenu filtri,
 
-                        vitamīni un citi veselības
-
-                        produkti.
+                        kā arī ērta produktu atlase.
 
                     </p>
 
@@ -426,15 +421,15 @@ if (count($featuredMedicines) < 4) {
 
                     <h3>
 
-                        Kvalitatīvi produkti
+                        Detalizēti produktu apraksti
 
                     </h3>
 
                     <p>
 
-                        Aptiekā pieejami pārbaudīti un
+                        Aktīvā viela, ražotājs, zāļu forma,
 
-                        kvalitatīvi veselības produkti.
+                        stiprums un informācijas avoti.
 
                     </p>
 
@@ -450,17 +445,15 @@ if (count($featuredMedicines) < 4) {
 
                     <h3>
 
-                        Rūpes par klientu
+                        Demonstrācijas pasūtījumi
 
                     </h3>
 
                     <p>
 
-                        Ērta un pārskatāma informācija
+                        Grozs, recepšu pārbaudes plūsma
 
-                        par aptiekā pieejamajiem
-
-                        produktiem.
+                        un testa maksājuma integrācija.
 
                     </p>
 
@@ -473,31 +466,49 @@ if (count($featuredMedicines) < 4) {
     </section>
 
         <!-- KĀPĒC PHARMACARE24 -->
-    <section id="kapec" class="section benefits-section">
+    <section id="kapec" class="section benefits-section" aria-labelledby="benefitsHeading">
         <div class="container">
             <div class="benefits-intro">
-                <span class="section-label">Ērts mācību projekts</span>
-                <h2 class="section-title">Kāpēc izvēlēties PharmaCare24?</h2>
-                <p>Demonstrācijas sistēma ar ērtu katalogu un pārskatāmu produkta informāciju.</p>
+                <span class="section-label">Pārdomāta lietošanas pieredze</span>
+                <h2 id="benefitsHeading" class="section-title">Kāpēc izvēlēties PharmaCare24?</h2>
+                <p>Trīs iemesli, kāpēc demonstrācijas katalogā ir vienkārši orientēties.</p>
             </div>
             <div class="benefits-grid">
                 <article class="benefit-card">
-                    <span class="benefit-card-icon" aria-hidden="true">🔎</span>
-                    <h3>Ātra produktu meklēšana</h3>
-                    <p>Izmantojiet meklēšanu, kategoriju, cenas un pieejamības filtrus, lai atrastu vajadzīgo.</p>
+                    <div class="benefit-topline">
+                        <span class="benefit-card-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/><path d="M8 11h6M11 8v6"/></svg>
+                        </span>
+                        <span class="benefit-number">01</span>
+                    </div>
+                    <h3>Ātra produktu atrašana</h3>
+                    <p>Meklējiet pēc nosaukuma, filtrējiet pēc kategorijas, cenas un pieejamības, kārtojiet rezultātus.</p>
+                    <a href="#zales" class="benefit-inline-link">Izpētīt katalogu <span aria-hidden="true">→</span></a>
                 </article>
                 <article class="benefit-card">
-                    <span class="benefit-card-icon" aria-hidden="true">🌗</span>
-                    <h3>Ērts dizains visās ierīcēs</h3>
-                    <p>Mobilajām ierīcēm pielāgota saskarne ar gaišo un tumšo režīmu.</p>
+                    <div class="benefit-topline">
+                        <span class="benefit-card-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+                        </span>
+                        <span class="benefit-number">02</span>
+                    </div>
+                    <h3>Pārskatāma informācija</h3>
+                    <p>Atsevišķā produkta lapā skatiet aktīvo vielu, ražotāju, formu, stiprumu un saiti uz oficiālo reģistru.</p>
+                    <a href="#izlase" class="benefit-inline-link">Atvērt produktu izlasi <span aria-hidden="true">→</span></a>
                 </article>
                 <article class="benefit-card">
-                    <span class="benefit-card-icon" aria-hidden="true">🛒</span>
-                    <h3>Pasūtījumu demonstrācija</h3>
-                    <p>Izmēģiniet grozu, recepšu pārbaudes darba plūsmu un Stripe testa maksājumu integrāciju.</p>
+                    <div class="benefit-topline">
+                        <span class="benefit-card-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M8 21h8M12 17v4"/><rect x="18" y="10" width="4" height="10" rx="1"/></svg>
+                        </span>
+                        <span class="benefit-number">03</span>
+                    </div>
+                    <h3>Ērti jebkurā ierīcē</h3>
+                    <p>Responsīvs dizains, gaišā un tumšā tēma un demonstrācijas grozs darbam datorā vai telefonā.</p>
+                    <a href="#pakalpojumi" class="benefit-inline-link">Iespējas un funkcijas <span aria-hidden="true">→</span></a>
                 </article>
             </div>
-            <p class="demo-notice"><strong>Uzmanību!</strong> PharmaCare24 ir mācību projekts, nevis īsta aptieka. Nepasūtiet reālas zāles un neievadiet īstus personas datus.</p>
+            <p class="demo-notice"><span aria-hidden="true">ⓘ</span> <strong>Demonstrācijas vietne:</strong> PharmaCare24 ir programmēšanas mācību projekts, nevis īsta aptieka. Šeit nevar iegādāties reālus medikamentus; neievadiet īstus personas datus.</p>
         </div>
     </section>
 
