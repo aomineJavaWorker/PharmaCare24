@@ -1,0 +1,33 @@
+/* PharmaCare24: kataloga izlase un priekšrocības. Mainīgie nāk no style.css. */
+.featured-section { background:var(--background-secondary); }
+.featured-intro { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:25px; }
+.featured-intro h2,.benefits-section h2 { margin:8px 0 8px; }
+.featured-intro p { margin:0; color:var(--muted); max-width:610px; }
+.featured-all-link { color:var(--primary); font-weight:700; white-space:nowrap; text-decoration:none; }
+.featured-all-link:hover { text-decoration:underline; }
+.featured-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; }
+.featured-card { display:flex; flex-direction:column; gap:12px; padding:18px; border:1px solid var(--border); border-radius:18px; background:var(--surface); box-shadow:0 6px 22px var(--shadow); transition:transform .2s,box-shadow .2s; }
+.featured-card:hover { transform:translateY(-4px); box-shadow:0 14px 30px var(--shadow); }
+.featured-card-image { height:150px; display:flex; align-items:center; justify-content:center; text-decoration:none; background:transparent; }
+.featured-card-image img { display:block; height:100%; max-height:145px; max-width:100%; object-fit:contain; }
+.featured-placeholder { font-size:50px; color:var(--primary); }
+.featured-category { font-size:12px; color:var(--primary); font-weight:700; }
+.featured-title { flex:1; margin:0; color:var(--heading); font-size:19px; line-height:1.35; }
+.featured-title a { color:inherit; text-decoration:none; }
+.featured-title a:hover { color:var(--primary); }
+.featured-price { font-size:23px; font-weight:700; color:var(--heading); }
+.featured-detail-link { display:block; padding:10px 13px; border-radius:9px; background:var(--surface-soft); color:var(--primary); text-align:center; font-weight:700; text-decoration:none; }
+.featured-detail-link:hover { background:var(--primary); color:white; }
+.benefits-section { background:var(--background); }
+.benefits-intro { max-width:690px; margin-bottom:26px; }
+.benefits-intro p { color:var(--muted); }
+.benefits-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.benefit-card { padding:24px; border:1px solid var(--border); border-radius:18px; background:var(--surface); }
+.benefit-card-icon { display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:13px; background:var(--surface-soft); font-size:25px; margin-bottom:15px; }
+.benefit-card h3 { margin:0 0 9px; color:var(--heading); font-size:20px; }
+.benefit-card p { margin:0; color:var(--muted); }
+.demo-notice { margin-top:27px; padding:13px 16px; border:1px solid var(--border); border-radius:12px; color:var(--muted); background:var(--surface-soft); font-size:14px; }
+.medicine-details-link { display:block; margin-top:10px; padding:11px 12px; text-align:center; color:var(--primary); background:var(--surface-soft); border-radius:10px; text-decoration:none; font-weight:700; }
+.medicine-details-link:hover { color:white; background:var(--primary); }
+@media(max-width:950px) { .featured-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .benefits-grid { grid-template-columns:1fr; } }
+@media(max-width:600px) { .featured-intro { flex-direction:column; align-items:start; } .featured-grid { gap:12px; } .featured-card { padding:12px; } .featured-card-image { height:115px; } .featured-card-image img { max-height:110px; } .featured-title { font-size:17px; } .featured-price { font-size:20px; } }

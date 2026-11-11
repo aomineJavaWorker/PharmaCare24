@@ -44,6 +44,36 @@ $stmt = $pdo->query(
 
 $medicines = $stmt->fetchAll();
 
+/* Ieteiktā produktu izlase no esošajiem kataloga ierakstiem.
+   Demonstrācijas izlase, nevis pārdošanas statistikas rangs. */
+$featuredMedicines = [];
+$featuredPriorities = ['Paracetamol', 'Ibuprofen', 'Vitamin C', 'No-Spa', 'Smecta'];
+foreach ($featuredPriorities as $keyword) {
+    foreach ($medicines as $item) {
+        if ((int) $item['stock_quantity'] <= 0 || (int) $item['prescription_required'] === 1) {
+            continue;
+        }
+        if (stripos($item['name'], $keyword) !== false) {
+            $featuredMedicines[(int) $item['id']] = $item;
+            break;
+        }
+    }
+    if (count($featuredMedicines) >= 4) {
+        break;
+    }
+}
+if (count($featuredMedicines) < 4) {
+    foreach ($medicines as $item) {
+        if ((int) $item['stock_quantity'] > 0 && (int) $item['prescription_required'] !== 1) {
+            $featuredMedicines[(int) $item['id']] = $item;
+        }
+        if (count($featuredMedicines) >= 4) {
+            break;
+        }
+    }
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +92,7 @@ $medicines = $stmt->fetchAll();
 
     >
 
-    <title>Aptieka</title>
+    <title>PharmaCare24 | Zāļu demonstrācijas katalogs</title>
     <link
         rel="icon"
         type="image/png"
@@ -80,6 +110,7 @@ $medicines = $stmt->fetchAll();
         href="assets/css/list-tools.css"
     >
 
+    <link rel="stylesheet" href="assets/css/home-refresh.css">
 </head>
 
 <body>
@@ -92,7 +123,7 @@ $medicines = $stmt->fetchAll();
 
             <span class="logo-icon">+</span>
 
-            Aptieka
+            PharmaCare24
 
         </a>
 
@@ -263,6 +294,38 @@ $medicines = $stmt->fetchAll();
 
     </section>
 
+        <!-- PRODUKTU IZLASE -->
+    <section id="izlase" class="section featured-section">
+        <div class="container">
+            <div class="featured-intro">
+                <div>
+                    <span class="section-label">Kataloga izlase</span>
+                    <h2 class="section-title">Iepazīstiet mūsu produktus</h2>
+                    <p>Daži produkti no demonstrācijas kataloga. Atveriet kartīti, lai uzzinātu vairāk.</p>
+                </div>
+                <a class="featured-all-link" href="#zales">Skatīt visu katalogu →</a>
+            </div>
+            <div class="featured-grid">
+                <?php foreach ($featuredMedicines as $featured): ?>
+                    <article class="featured-card">
+                        <a class="featured-card-image" href="medicine.php?id=<?= (int) $featured['id'] ?>" aria-label="Skatīt <?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?>">
+                            <?php if (!empty($featured['image'])): ?>
+                                <img src="<?= htmlspecialchars($featured['image'], ENT_QUOTES, 'UTF-8') ?>"
+                                     alt="<?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?> iepakojums" loading="lazy">
+                            <?php else: ?>
+                                <span class="featured-placeholder">+</span>
+                            <?php endif; ?>
+                        </a>
+                        <span class="featured-category"><?= htmlspecialchars($featured['category_name'] ?? 'Bez kategorijas', ENT_QUOTES, 'UTF-8') ?></span>
+                        <h3 class="featured-title"><a href="medicine.php?id=<?= (int) $featured['id'] ?>"><?= htmlspecialchars($featured['name'], ENT_QUOTES, 'UTF-8') ?></a></h3>
+                        <span class="featured-price"><?= number_format((float) $featured['price'], 2, ',', ' ') ?> €</span>
+                        <a class="featured-detail-link" href="medicine.php?id=<?= (int) $featured['id'] ?>">Skatīt produktu</a>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
     <!-- PAR MUMS -->
 
     <section
@@ -407,6 +470,35 @@ $medicines = $stmt->fetchAll();
 
         </div>
 
+    </section>
+
+        <!-- KĀPĒC PHARMACARE24 -->
+    <section id="kapec" class="section benefits-section">
+        <div class="container">
+            <div class="benefits-intro">
+                <span class="section-label">Ērts mācību projekts</span>
+                <h2 class="section-title">Kāpēc izvēlēties PharmaCare24?</h2>
+                <p>Demonstrācijas sistēma ar ērtu katalogu un pārskatāmu produkta informāciju.</p>
+            </div>
+            <div class="benefits-grid">
+                <article class="benefit-card">
+                    <span class="benefit-card-icon" aria-hidden="true">🔎</span>
+                    <h3>Ātra produktu meklēšana</h3>
+                    <p>Izmantojiet meklēšanu, kategoriju, cenas un pieejamības filtrus, lai atrastu vajadzīgo.</p>
+                </article>
+                <article class="benefit-card">
+                    <span class="benefit-card-icon" aria-hidden="true">🌗</span>
+                    <h3>Ērts dizains visās ierīcēs</h3>
+                    <p>Mobilajām ierīcēm pielāgota saskarne ar gaišo un tumšo režīmu.</p>
+                </article>
+                <article class="benefit-card">
+                    <span class="benefit-card-icon" aria-hidden="true">🛒</span>
+                    <h3>Pasūtījumu demonstrācija</h3>
+                    <p>Izmēģiniet grozu, recepšu pārbaudes darba plūsmu un Stripe testa maksājumu integrāciju.</p>
+                </article>
+            </div>
+            <p class="demo-notice"><strong>Uzmanību!</strong> PharmaCare24 ir mācību projekts, nevis īsta aptieka. Nepasūtiet reālas zāles un neievadiet īstus personas datus.</p>
+        </div>
     </section>
 
     <!-- ZĀĻU KATALOGS -->
@@ -627,47 +719,9 @@ $medicines = $stmt->fetchAll();
 
                         </div>
 
-                        <button
-
-                            type="button"
-
-                            class="medicine-info-button"
-
-                            data-medicine-name="<?= htmlspecialchars(
-
-                                $medicine['name'],
-
-                                ENT_QUOTES,
-
-                                'UTF-8'
-
-                            ) ?>"
-
-                            data-active-substance="<?= htmlspecialchars(
-
-                                $medicine['active_substance'] ?? '',
-
-                                ENT_QUOTES,
-
-                                'UTF-8'
-
-                            ) ?>"
-
-                            data-api-search-name="<?= htmlspecialchars(
-
-                                $medicine['api_search_name'] ?? '',
-
-                                ENT_QUOTES,
-
-                                'UTF-8'
-
-                            ) ?>"
-
-                        >
-
+                        <a class="medicine-details-link" href="medicine.php?id=<?= (int) $medicine['id'] ?>">
                             Vairāk informācijas
-
-                        </button>
+                        </a>
 
                         <button
 
@@ -1167,13 +1221,13 @@ $medicines = $stmt->fetchAll();
 
             <span class="logo-icon">+</span>
 
-            Aptieka
+            PharmaCare24
 
         </div>
 
         <p>
 
-            © 2026 Aptieka
+            © 2026 PharmaCare24 · Mācību projekts
 
         </p>
 

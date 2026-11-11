@@ -564,6 +564,7 @@
             return addField(labelText, select);
         }
 
+        
         function createPriceInput(labelText, placeholder) {
             const input = document.createElement('input');
             input.type = 'number';
@@ -571,10 +572,57 @@
             input.step = '0.01';
             input.inputMode = 'decimal';
             input.placeholder = placeholder;
-            input.className = 'catalog-filter-control';
+            input.className = 'catalog-filter-control catalog-price-input';
+            input.id = labelText.includes('no')
+                ? 'catalog-price-min'
+                : 'catalog-price-max';
 
-            return addField(labelText, input);
+            const field = document.createElement('div');
+            field.className = 'catalog-filter-field';
+
+            const label = document.createElement('label');
+            label.htmlFor = input.id;
+            label.textContent = labelText;
+
+            const stepper = document.createElement('div');
+            stepper.className = 'catalog-price-stepper';
+
+            function createButton(symbol, change, title) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'catalog-price-button';
+                button.textContent = symbol;
+                button.title = title;
+                button.setAttribute('aria-label', title);
+
+                button.addEventListener('click', function () {
+                    const current = Number(input.value) || 0;
+                    const next = Math.max(0, current + change);
+
+                    input.value = next.toFixed(2);
+                    input.dispatchEvent(new Event('input', {
+                        bubbles: true
+                    }));
+                });
+
+                return button;
+            }
+
+            stepper.appendChild(
+                createButton('−', -1, 'Samazināt cenu par 1 €')
+            );
+            stepper.appendChild(input);
+            stepper.appendChild(
+                createButton('+', 1, 'Palielināt cenu par 1 €')
+            );
+
+            field.appendChild(label);
+            field.appendChild(stepper);
+            container.appendChild(field);
+
+            return input;
         }
+
 
         const categories = Array.from(new Set(
             medicines.map(function (medicine) {
