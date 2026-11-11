@@ -531,218 +531,330 @@
        KLIENTA ZĀĻU KATALOGS
        ========================================================= */
 
-    function initMedicineCatalog() {
+    function createCatalogFilters(medicines) {
+        const container = document.createElement('div');
+        container.className = 'catalog-filters';
+        container.setAttribute('role', 'group');
+        container.setAttribute('aria-label', 'Kataloga filtri');
 
-        const medicineSection =
-            document.getElementById(
-                'zales'
-            );
+        function addField(labelText, input) {
+            const label = document.createElement('label');
+            label.className = 'catalog-filter-field';
 
+            const title = document.createElement('span');
+            title.textContent = labelText;
+            label.appendChild(title);
+            label.appendChild(input);
+            container.appendChild(label);
 
-        const medicineGrid =
-            medicineSection?.querySelector(
-                '.medicine-grid'
-            );
-
-
-        if (
-            !medicineSection ||
-            !medicineGrid
-        ) {
-            return;
+            return input;
         }
 
+        function createSelect(labelText, choices) {
+            const select = document.createElement('select');
+            select.className = 'catalog-filter-control';
 
-        const cards =
-            Array.from(
-                medicineGrid.querySelectorAll(
-                    '.medicine-card'
-                )
-            );
-
-
-        if (
-            cards.length === 0
-        ) {
-            return;
-        }
-
-
-        const tools =
-            createTools({
-
-                placeholder:
-                    'Meklēt zāles...',
-
-                defaultPageSize:
-                    8,
-
-                pageSizes:
-                    [4, 8, 12, 16]
+            choices.forEach(function (choice) {
+                const option = document.createElement('option');
+                option.value = choice[0];
+                option.textContent = choice[1];
+                select.appendChild(option);
             });
 
+            return addField(labelText, select);
+        }
 
-        tools.toolbar.classList.add(
-            'catalog-list-tools'
+        function createPriceInput(labelText, placeholder) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.step = '0.01';
+            input.inputMode = 'decimal';
+            input.placeholder = placeholder;
+            input.className = 'catalog-filter-control';
+
+            return addField(labelText, input);
+        }
+
+        const categories = Array.from(new Set(
+            medicines.map(function (medicine) {
+                return medicine.category;
+            }).filter(Boolean)
+        )).sort(function (a, b) {
+            return a.localeCompare(b, 'lv');
+        });
+
+        const category = createSelect(
+            'Kategorija',
+            [['', 'Visas kategorijas']].concat(
+                categories.map(function (name) {
+                    return [name, name];
+                })
+            )
         );
 
+        const minPrice = createPriceInput('Cena no (€)', '0.00');
+        const maxPrice = createPriceInput('Cena līdz (€)', '50.00');
 
-        tools.pagination.classList.add(
-            'catalog-pagination'
+        const prescription = createSelect('Recepte', [
+            ['', 'Visas zāles'],
+            ['no', 'Bez receptes'],
+            ['yes', 'Recepšu zāles']
+        ]);
+
+        const availability = createSelect('Pieejamība', [
+            ['', 'Visas'],
+            ['available', 'Pieejamas'],
+            ['unavailable', 'Nav pieejamas']
+        ]);
+
+        const sort = createSelect('Kārtot pēc', [
+            ['default', 'Sākotnējā secība'],
+            ['price-asc', 'Cena: no zemākās'],
+            ['price-desc', 'Cena: no augstākās'],
+            ['name-asc', 'Nosaukums: A–Z'],
+            ['name-desc', 'Nosaukums: Z–A']
+        ]);
+
+        const clearButton = document.createElement('button');
+        clearButton.type = 'button';
+        clearButton.className = 'catalog-filter-reset';
+        clearButton.textContent = 'Notīrīt filtrus';
+        container.appendChild(clearButton);
+
+        return {
+            container,
+            category,
+            minPrice,
+            maxPrice,
+            prescription,
+            availability,
+            sort,
+            clearButton
+        };
+    }
+
+
+    function initMedicineCatalog() {
+        const medicineSection = document.getElementById('zales');
+        const medicineGrid = medicineSection?.querySelector('.medicine-grid');
+
+        if (!medicineSection || !medicineGrid) {
+            return;
+        }
+
+        const cards = Array.from(
+            medicineGrid.querySelectorAll('.medicine-card')
         );
 
+        if (cards.length === 0) {
+            return;
+        }
 
-        medicineGrid.insertAdjacentElement(
-            'beforebegin',
-            tools.toolbar
-        );
+        const medicines = cards.map(function (card, index) {
+            const buyButton = card.querySelector('.medicine-buy-button');
 
+            return {
+                card,
+                originalIndex: index,
+                name: card.querySelector('h3')?.textContent.trim() || '',
+                category: card.querySelector('.medicine-category')
+                    ?.textContent.trim() || '',
+                price: Number(buyButton?.dataset.medicinePrice || 0),
+                prescription: buyButton?.dataset.prescriptionRequired === '1',
+                available: Number(buyButton?.dataset.medicineStock || 0) > 0,
+                searchText: normalizeText(card.textContent)
+            };
+        });
 
-        medicineGrid.insertAdjacentElement(
-            'afterend',
-            tools.pagination
-        );
+        const tools = createTools({
+            placeholder: 'Meklēt zāles...',
+            defaultPageSize: 8,
+            pageSizes: [4, 8, 12, 16]
+        });
 
+        tools.toolbar.classList.add('catalog-list-tools');
+        tools.status.setAttribute('aria-live', 'polite');
+        tools.pagination.classList.add('catalog-pagination');
+
+        const filters = createCatalogFilters(medicines);
+
+        const emptyMessage = document.createElement('p');
+        emptyMessage.className = 'catalog-empty';
+        emptyMessage.textContent =
+            'Zāles nav atrastas. Mainiet meklēšanu vai notīriet filtrus.';
+        emptyMessage.hidden = true;
+
+        medicineGrid.insertAdjacentElement('beforebegin', tools.toolbar);
+        medicineGrid.insertAdjacentElement('beforebegin', filters.container);
+        medicineGrid.insertAdjacentElement('afterend', emptyMessage);
+        emptyMessage.insertAdjacentElement('afterend', tools.pagination);
 
         let currentPage = 1;
 
+        function compareNames(a, b) {
+            return a.name.localeCompare(b.name, 'lv', {
+                sensitivity: 'base'
+            });
+        }
 
-        function refresh(
-            resetPage = false
-        ) {
+        function compareMedicines(a, b) {
+            let result = 0;
 
+            switch (filters.sort.value) {
+                case 'price-asc':
+                    result = a.price - b.price;
+                    break;
+                case 'price-desc':
+                    result = b.price - a.price;
+                    break;
+                case 'name-asc':
+                    result = compareNames(a, b);
+                    break;
+                case 'name-desc':
+                    result = compareNames(b, a);
+                    break;
+                default:
+                    return a.originalIndex - b.originalIndex;
+            }
+
+            return result || a.originalIndex - b.originalIndex;
+        }
+
+        function refresh(resetPage = false) {
             if (resetPage) {
                 currentPage = 1;
             }
 
+            const query = normalizeText(tools.searchInput.value);
+            const pageSize = Number(tools.pageSizeSelect.value) || 8;
+            const minPrice = filters.minPrice.value === ''
+                ? null : Number(filters.minPrice.value);
+            const maxPrice = filters.maxPrice.value === ''
+                ? null : Number(filters.maxPrice.value);
 
-            const query =
-                normalizeText(
-                    tools.searchInput.value
-                );
+            const sortedMedicines = medicines.slice().sort(compareMedicines);
 
-
-            const pageSize =
-                Number(
-                    tools.pageSizeSelect.value
-                );
-
-
-            const filteredCards =
-                cards.filter(
-                    function (card) {
-
-                        return normalizeText(
-                            card.textContent
-                        ).includes(
-                            query
-                        );
-                    }
-                );
-
-
-            const totalPages =
-                Math.max(
-                    1,
-                    Math.ceil(
-                        filteredCards.length /
-                        pageSize
-                    )
-                );
-
-
-            if (
-                currentPage >
-                totalPages
-            ) {
-
-                currentPage =
-                    totalPages;
-            }
-
-
-            cards.forEach(
-                function (card) {
-
-                    card.hidden =
-                        true;
+            const filteredMedicines = sortedMedicines.filter(function (medicine) {
+                if (!medicine.searchText.includes(query)) {
+                    return false;
                 }
+
+                if (filters.category.value &&
+                    medicine.category !== filters.category.value) {
+                    return false;
+                }
+
+                if (minPrice !== null && medicine.price < minPrice) {
+                    return false;
+                }
+
+                if (maxPrice !== null && medicine.price > maxPrice) {
+                    return false;
+                }
+
+                if (filters.prescription.value === 'yes' &&
+                    !medicine.prescription) {
+                    return false;
+                }
+
+                if (filters.prescription.value === 'no' &&
+                    medicine.prescription) {
+                    return false;
+                }
+
+                if (filters.availability.value === 'available' &&
+                    !medicine.available) {
+                    return false;
+                }
+
+                if (filters.availability.value === 'unavailable' &&
+                    medicine.available) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            const totalPages = Math.max(
+                1,
+                Math.ceil(filteredMedicines.length / pageSize)
             );
 
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
 
-            const startIndex =
-                (
-                    currentPage - 1
-                ) * pageSize;
+            sortedMedicines.forEach(function (medicine) {
+                medicine.card.hidden = true;
+                medicineGrid.appendChild(medicine.card);
+            });
 
+            const startIndex = (currentPage - 1) * pageSize;
 
-            const endIndex =
-                startIndex +
-                pageSize;
+            filteredMedicines.slice(
+                startIndex,
+                startIndex + pageSize
+            ).forEach(function (medicine) {
+                medicine.card.hidden = false;
+            });
 
-
-            filteredCards
-                .slice(
-                    startIndex,
-                    endIndex
-                )
-                .forEach(
-                    function (card) {
-
-                        card.hidden =
-                            false;
-                    }
-                );
-
-
+            emptyMessage.hidden = filteredMedicines.length > 0;
             tools.status.textContent =
-                'Atrastas zāles: ' +
-                filteredCards.length;
-
+                'Atrastas zāles: ' + filteredMedicines.length +
+                ' no ' + medicines.length;
 
             renderPagination(
                 tools.pagination,
                 currentPage,
                 totalPages,
                 function (page) {
-
-                    currentPage =
-                        page;
-
+                    currentPage = page;
                     refresh(false);
-
-
-                    medicineSection.scrollIntoView(
-                        {
-                            behavior:
-                                'smooth',
-
-                            block:
-                                'start'
-                        }
-                    );
+                    medicineSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             );
         }
 
+        tools.searchInput.addEventListener('input', function () {
+            refresh(true);
+        });
 
-        tools.searchInput.addEventListener(
-            'input',
-            function () {
+        tools.pageSizeSelect.addEventListener('change', function () {
+            refresh(true);
+        });
 
+        [
+            filters.category,
+            filters.prescription,
+            filters.availability,
+            filters.sort
+        ].forEach(function (select) {
+            select.addEventListener('change', function () {
                 refresh(true);
-            }
-        );
+            });
+        });
 
-
-        tools.pageSizeSelect.addEventListener(
-            'change',
-            function () {
-
+        [filters.minPrice, filters.maxPrice].forEach(function (input) {
+            input.addEventListener('input', function () {
                 refresh(true);
-            }
-        );
+            });
+        });
 
+        filters.clearButton.addEventListener('click', function () {
+            tools.searchInput.value = '';
+            tools.pageSizeSelect.value = '8';
+            filters.category.value = '';
+            filters.minPrice.value = '';
+            filters.maxPrice.value = '';
+            filters.prescription.value = '';
+            filters.availability.value = '';
+            filters.sort.value = 'default';
+            refresh(true);
+        });
 
         refresh(true);
     }
